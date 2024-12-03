@@ -1,9 +1,55 @@
-# React + Vite
+# CarbonCopy Project Setup Guide
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Prerequisites
+- Node.js (recommended version 18.x or later)
+- npm (comes with Node.js)
 
-Currently, two official plugins are available:
+## Getting Started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-# CarbonCounter
+### 1. Clone the Repository
+```bash
+git clone https://github.com/xcvh/CarbonCounter
+cd CarbonCounter
+```
+
+### 2. Install Dependencies
+```bash
+npm install
+```
+This command will install all the project dependencies defined in the `package.json` file, including:
+- React
+- Vite
+- Tailwind CSS
+- Other project-specific packages
+
+### 3. Run the Development Server
+```bash
+npm run dev
+```
+This will start the Vite development server. By default, the app will be available at `http://localhost:5173`
+
+### 4. Building for Production
+```bash
+npm run build
+```
+This command will create a production-ready build of your application in the `dist` folder.
+
+### 5. Preview Production Build (Optional)
+```bash
+npm run preview
+```
+This will serve the production build locally for testing.
+
+## Troubleshooting
+- Ensure you have the correct Node.js version installed
+- If you encounter dependency issues, try deleting the `node_modules` folder and running `npm install` again
+- Check that your `.env` files (if any) are properly configured
+
+## Development Tools
+- This project uses Vite for fast development and building
+- Tailwind CSS is integrated for styling
+- ESLint is included for code linting
+
+## Additional Notes
+- Make sure to commit your `package.json` and `package-lock.json`
+- Do not commit the `node_modules` folder
