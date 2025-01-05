@@ -6,7 +6,7 @@ import Sidebar from "../components/Sidebar";
 function App() {
   return (
     <div>
-      CarbonCounter
+      <h1>CarbonCounter</h1>
       <Sidebar />
       <LandingPage />
       <ResultsPage />
