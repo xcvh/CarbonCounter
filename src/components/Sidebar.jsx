@@ -1,24 +1,24 @@
 function Sidebar() {
   return (
-    <div>
+    <div className="sticky top-0 overscroll-y-scroll flex flex-col bg-green-800">
       <ul>
         <li>
-          <a href="" className="text-blue-500 underline">
+          <a href="" className="text-gray-100 underline">
             A
           </a>
         </li>
         <li>
-          <a href="" className="text-blue-500 underline">
+          <a href="" className="text-gray-100 underline">
             bunch
           </a>
         </li>
         <li>
-          <a href="" className="text-blue-500 underline">
+          <a href="" className="text-gray-100 underline">
             of
           </a>
         </li>
         <li>
-          <a href="" className="text-blue-500 underline">
+          <a href="" className="text-gray-100 underline">
             links
           </a>
         </li>

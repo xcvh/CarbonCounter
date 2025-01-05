@@ -5,12 +5,16 @@ import Sidebar from "../components/Sidebar";
 
 function App() {
   return (
-    <div>
-      <h1>CarbonCounter</h1>
+    <div className="container mx-auto grid grid-cols-6 gap-4 mt-4">
       <Sidebar />
-      <LandingPage />
-      <ResultsPage />
-      <CalculatorPage />
+      <div>
+        <h1 className="text-xl font-serif font-bold text-green-700">
+          CarbonCounter
+        </h1>
+        <LandingPage />
+        <ResultsPage />
+        <CalculatorPage />
+      </div>
     </div>
   );
 }
