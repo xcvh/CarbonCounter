@@ -2,6 +2,7 @@ import LandingPage from "./LandingPage";
 import ResultsPage from "./ResultsPage";
 import CalculatorPage from "./CalculatorPage";
 import Sidebar from "../components/Sidebar";
+import Route from "../components/Route";
 
 function App() {
   return (
@@ -11,9 +12,15 @@ function App() {
         <h1 className="text-xl font-serif font-bold text-green-700">
           CarbonCounter
         </h1>
-        <LandingPage />
-        <ResultsPage />
-        <CalculatorPage />
+        <Route path="/">
+          <LandingPage />
+        </Route>
+        <Route path="/results">
+          <ResultsPage />
+        </Route>
+        <Route path="/calculator">
+          <CalculatorPage />
+        </Route>
       </div>
     </div>
   );
