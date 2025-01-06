@@ -13,6 +13,7 @@ function Sidebar() {
         key={link.label}
         to={link.path}
         className="mb-1 text-white hover:underline"
+        activeClassName="font-bold border-l-4 pl-2 border-white"
       >
         {link.label}
       </Link>
@@ -20,7 +21,7 @@ function Sidebar() {
   });
 
   return (
-    <div className="sticky top-0 overscroll-y-scroll flex flex-col bg-green-800">
+    <div className="sticky top-0 overscroll-y-scroll flex flex-col items-start bg-green-800">
       {renderedLinks}
     </div>
   );
