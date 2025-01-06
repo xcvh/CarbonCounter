@@ -2,14 +2,14 @@ import Link from "./Link";
 
 function Sidebar() {
   const links = [
-    { label: "Landing Page", path: "/" },
+    { label: "Home", path: "/" },
     { label: "Calculator", path: "/calculator" },
     { label: "Results", path: "/results" },
   ];
 
   const renderedLinks = links.map((link) => {
     return (
-      <Link key={link.label} to={link.path}>
+      <Link key={link.label} to={link.path} className="mb-1">
         {link.label}
       </Link>
     );
