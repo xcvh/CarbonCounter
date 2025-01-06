@@ -10,6 +10,12 @@ function CalculatorPage() {
         sapiente inventore quo pariatur sit maiores corrupti asperiores aperiam
         sunt deserunt.
       </p>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit error
+        officia hic maiores corporis, sequi similique impedit reiciendis tenetur
+        distinctio aliquam delectus ullam vitae quia laudantium incidunt iste,
+        odit officiis.
+      </p>
     </div>
   );
 }

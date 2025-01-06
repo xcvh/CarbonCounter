@@ -8,7 +8,7 @@ function App() {
   return (
     <div className="container mx-auto grid grid-cols-6 gap-4 mt-4">
       <Sidebar />
-      <div>
+      <div className="col-span-5">
         <h1 className="text-xl font-serif font-bold text-green-700">
           CarbonCounter
         </h1>
