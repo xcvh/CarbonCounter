@@ -9,7 +9,11 @@ function Sidebar() {
 
   const renderedLinks = links.map((link) => {
     return (
-      <Link key={link.label} to={link.path} className="mb-1">
+      <Link
+        key={link.label}
+        to={link.path}
+        className="mb-1 text-white hover:underline"
+      >
         {link.label}
       </Link>
     );
