@@ -3,15 +3,15 @@ import ResultsPage from "./ResultsPage";
 import CalculatorPage from "./CalculatorPage";
 import Sidebar from "../components/Sidebar";
 import Route from "../components/Route";
+import { SidebarProvider } from "../context/sidebar";
 
 function App() {
   return (
-    <div className="container mx-auto grid grid-cols-6 gap-4 mt-4">
-      <Sidebar />
-      <div className="col-span-5">
-        <h1 className="text-xl font-serif font-bold text-green-700">
-          CarbonCounter
-        </h1>
+    <main className="App flex bg-green-800">
+      <SidebarProvider>
+        <Sidebar></Sidebar>
+      </SidebarProvider>
+      <div className="flex-grow p-6 bg-orange-50 rounded-s-3xl">
         <Route path="/">
           <LandingPage />
         </Route>
@@ -22,7 +22,7 @@ function App() {
           <CalculatorPage />
         </Route>
       </div>
-    </div>
+    </main>
   );
 }
 
