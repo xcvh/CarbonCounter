@@ -13,10 +13,31 @@ const PORT = 5000; // Backend-Port
 // Middleware: Statische Dateien ausliefern
 app.use(express.static(path.resolve(__dirname, 'public')));
 
-// Beispielroute
+// Test
 app.get('/api/message', (req, res) => {
   res.json({ message: 'Hallo1!' });
 });
+
+//Get the questions and answers for the form
+app.get('/api/questions', (req, res) => {
+  res.json({ message: '<Die Fragen>' });
+});
+
+//Send the answers/results to the backend
+app.post('/api/answers', (req, res) => {
+  res.status(201).json({ message: 'Antworten gespeichert' });
+});
+
+// Get the results
+app.get('/api/results', (req, res) => {
+  res.json({ message: '<Results>' });
+});
+
+// Geht the suggestions
+app.get('/api/suggestions', (req, res) => {
+  res.json({ message: '<Results>' });
+});
+
 
 // Server starten
 app.listen(PORT, () => {
