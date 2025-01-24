@@ -7,21 +7,23 @@ import { SidebarProvider } from "../context/sidebar";
 
 function App() {
   return (
-    <main className="App flex bg-green-800">
+    <main className="relative flex min-h-screen bg-green-800">
       <SidebarProvider>
-        <Sidebar></Sidebar>
+        <Sidebar />
+        <div className="flex-1 min-h-screen transition-all duration-300 bg-orange-50 md:rounded-s-3xl">
+          <div className="p-6">
+            <Route path="/">
+              <LandingPage />
+            </Route>
+            <Route path="/results">
+              <ResultsPage />
+            </Route>
+            <Route path="/calculator">
+              <CalculatorPage />
+            </Route>
+          </div>
+        </div>
       </SidebarProvider>
-      <div className="flex-grow p-6 bg-orange-50 rounded-s-3xl">
-        <Route path="/">
-          <LandingPage />
-        </Route>
-        <Route path="/results">
-          <ResultsPage />
-        </Route>
-        <Route path="/calculator">
-          <CalculatorPage />
-        </Route>
-      </div>
     </main>
   );
 }
