@@ -1,7 +1,7 @@
 function ResultsPage() {
   return (
-    <div>
-      <h2 className="text-lg font-serif font-bold text-green-950">
+    <div className="prose">
+      <h2>
         Results Page
       </h2>
       <p>

@@ -1,4 +1,4 @@
-import LandingPage from "./LandingPage";
+import Components from "./LandingPage";
 import ResultsPage from "./ResultsPage";
 import CalculatorPage from "./CalculatorPage";
 import Sidebar from "../components/Sidebar";
@@ -13,7 +13,7 @@ function App() {
         <div className="flex-1 min-h-screen transition-all duration-300 bg-orange-50 md:rounded-s-3xl">
           <div className="p-6">
             <Route path="/">
-              <LandingPage />
+              <Components />
             </Route>
             <Route path="/results">
               <ResultsPage />
