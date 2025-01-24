@@ -1,7 +1,7 @@
 function CalculatorPage() {
   return (
-    <div>
-      <h2 className="text-lg font-serif font-bold text-green-950">
+    <div className="prose">
+      <h2>
         Calculator Page
       </h2>
       <p>
