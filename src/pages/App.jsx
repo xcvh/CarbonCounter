@@ -7,7 +7,7 @@ import MobilityPage from "./MobilityPage";
 import FoodPage from "./FoodPage";
 import ConsumptionPage from "./ConsumptionPage";
 import Sidebar from "../components/Sidebar";
-import { SidebarProvider } from "../context/sidebar";
+import { SidebarProvider } from "../contexts/SidebarContext";
 
 function App() {
     return (

@@ -16,4 +16,4 @@ function SidebarProvider({ children }) {
 }
 
 export { SidebarProvider };
-export default SidebarContext;
+export default SidebarContext; 

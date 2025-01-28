@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useContext } from "react";
 import { useLocation } from 'react-router-dom';
-import SidebarContext from "../context/sidebar.jsx";
+import SidebarContext from "../contexts/SidebarContext";
 import Link from "./Link";
 
 function Sidebar() {
