@@ -5,6 +5,10 @@ import {
     Home,
     LayoutDashboard,
     Menu,
+    Home as HouseIcon,
+    Car,
+    Utensils,
+    ShoppingBag,
 } from "lucide-react";
 import { useContext } from "react";
 import { useLocation } from 'react-router-dom';
@@ -19,12 +23,36 @@ function Sidebar() {
         setExpanded(!expanded);
     };
 
+    const isInCalculator = location.pathname.startsWith('/calculator');
+
     const links = [
         { label: "Home", path: "/", icon: <Home size={20} /> },
         {
             label: "Calculator",
             path: "/calculator",
             icon: <Calculator size={20} />,
+            subPages: [
+                {
+                    label: "Living",
+                    path: "/calculator/living",
+                    icon: <HouseIcon size={20} />,
+                },
+                {
+                    label: "Mobility",
+                    path: "/calculator/mobility",
+                    icon: <Car size={20} />,
+                },
+                {
+                    label: "Food",
+                    path: "/calculator/food",
+                    icon: <Utensils size={20} />,
+                },
+                {
+                    label: "Consumption",
+                    path: "/calculator/consumption",
+                    icon: <ShoppingBag size={20} />,
+                },
+            ],
         },
         {
             label: "Results",
@@ -35,12 +63,16 @@ function Sidebar() {
 
     const renderedLinks = links.map((link) => {
         const activeLink = link.path === location.pathname;
+        const isSubPageActive = link.subPages?.some(
+            (subPage) => subPage.path === location.pathname
+        );
+
         return (
             <li key={link.label}>
                 <Link
                     to={link.path}
                     className={`relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors text-stone-50
-            ${activeLink ? "bg-gradient-to-tr from-emerald-800 to-emerald-900" : "hover:bg-green-900"}`}
+            ${(activeLink || isSubPageActive) ? "bg-gradient-to-tr from-emerald-800 to-emerald-900" : "hover:bg-green-900"}`}
                 >
                     {link.icon}
                     <span
@@ -50,6 +82,25 @@ function Sidebar() {
                         {link.label}
                     </span>
                 </Link>
+                {link.subPages && expanded && isInCalculator && (
+                    <ul className="ml-4">
+                        {link.subPages.map((subPage) => {
+                            const activeSubPage = subPage.path === location.pathname;
+                            return (
+                                <li key={subPage.label}>
+                                    <Link
+                                        to={subPage.path}
+                                        className={`relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors text-stone-50
+                                ${activeSubPage ? "bg-gradient-to-tr from-emerald-800 to-emerald-900" : "hover:bg-green-900"}`}
+                                    >
+                                        {subPage.icon}
+                                        <span className="ml-3">{subPage.label}</span>
+                                    </Link>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                )}
             </li>
         );
     });
