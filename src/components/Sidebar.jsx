@@ -7,12 +7,13 @@ import {
     Menu,
 } from "lucide-react";
 import { useContext } from "react";
-import useNavigation from "../hooks/use-navigation.jsx";
+import { useLocation } from 'react-router-dom';
 import SidebarContext from "../context/sidebar.jsx";
 import Link from "./Link";
 
 function Sidebar() {
     const { expanded, setExpanded } = useContext(SidebarContext);
+    const location = useLocation();
 
     const toggleSidebar = () => {
         setExpanded(!expanded);
@@ -32,10 +33,8 @@ function Sidebar() {
         },
     ];
 
-    const { currentPath } = useNavigation();
-
     const renderedLinks = links.map((link) => {
-        const activeLink = link.path === currentPath;
+        const activeLink = link.path === location.pathname;
         return (
             <li key={link.label}>
                 <Link
@@ -45,9 +44,8 @@ function Sidebar() {
                 >
                     {link.icon}
                     <span
-                        className={`overflow-hidden transition-all ${
-                            expanded ? "w-52 ml-3" : "w-0"
-                        }`}
+                        className={`overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"
+                            }`}
                     >
                         {link.label}
                     </span>
@@ -69,9 +67,8 @@ function Sidebar() {
             {/* Mobile Backdrop */}
             <div
                 onClick={toggleSidebar}
-                className={`fixed inset-0 bg-black/50 md:hidden transition-opacity duration-200 ${
-                    expanded ? "opacity-100" : "opacity-0 pointer-events-none"
-                }`}
+                className={`fixed inset-0 bg-black/50 md:hidden transition-opacity duration-200 ${expanded ? "opacity-100" : "opacity-0 pointer-events-none"
+                    }`}
             />
 
             {/* Sidebar */}

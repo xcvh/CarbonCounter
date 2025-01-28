@@ -1,8 +1,8 @@
+import { Routes, Route } from 'react-router-dom';
 import Components from "./Components";
 import ResultsPage from "./ResultsPage";
 import CalculatorPage from "./CalculatorPage";
 import Sidebar from "../components/Sidebar";
-import Route from "../components/Route";
 import { SidebarProvider } from "../context/sidebar";
 
 function App() {
@@ -12,15 +12,11 @@ function App() {
                 <Sidebar />
                 <div className="flex-1 min-h-screen transition-all duration-300 bg-orange-50 md:rounded-s-3xl">
                     <div className="p-6">
-                        <Route path="/">
-                            <Components />
-                        </Route>
-                        <Route path="/results">
-                            <ResultsPage />
-                        </Route>
-                        <Route path="/calculator">
-                            <CalculatorPage />
-                        </Route>
+                        <Routes>
+                            <Route path="/" element={<Components />} />
+                            <Route path="/results" element={<ResultsPage />} />
+                            <Route path="/calculator" element={<CalculatorPage />} />
+                        </Routes>
                     </div>
                 </div>
             </SidebarProvider>
