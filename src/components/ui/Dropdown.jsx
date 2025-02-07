@@ -9,7 +9,7 @@ const Dropdown = ({ trigger, items, className = '' }) => {
             <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
                 {items.map((item, index) => (
                     <li key={index}>
-                        <a onClick={item.onClick}>{item.label}</a>
+                        <a className="btn btn-ghost no-underline" onClick={item.onClick}>{item.label}</a>
                     </li>
                 ))}
             </ul>

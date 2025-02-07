@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
+import Range from '../components/ui/Range';
 import RadioGroup from '../components/ui/RadioGroup';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
@@ -45,10 +46,10 @@ function FoodPage() {
     ];
 
     const localFoodOptions = [
-        { value: 'over75', label: 'Over 75%' },
-        { value: '50-75', label: '50–75%' },
-        { value: '25-50', label: '25–50%' },
-        { value: 'under25', label: 'Under 25%' },
+        { value: 'over75', label: 'Mainly local and seasonal food' },
+        { value: '50-75', label: 'Quite a lot of local and seasonal food' },
+        { value: '25-50', label: 'Some local and seasonal food' },
+        { value: 'under25', label: 'Little local and seasonal food' },
     ];
 
     const processedFoodOptions = [
@@ -66,7 +67,7 @@ function FoodPage() {
     return (
         <div className="prose container mx-auto p-4 max-w-3xl">
             <h2 className="text-2xl font-bold mb-4">Food & Diet</h2>
-            <p className="text-gray-600 mb-6">Calculate your CO₂ footprint based on your eating habits.</p>
+            <p className="text-xl text-gray-800 font-medium mb-6">See how your diet is impacting your CO₂ footprint.</p>
 
             <div className="space-y-6">
                 <Card className="bg-white p-6">
@@ -74,12 +75,19 @@ function FoodPage() {
                         <h3 className="text-lg font-semibold m-0">Diet Type</h3>
                         <InfoIcon onClick={() => document.getElementById('diet-modal').showModal()} />
                     </div>
+                    <p className="text-sm text-gray-600 mt-2">
+                        How much meat do you eat? Are you vegan, vegetarian, or on a mixed diet? Or even a carnivore?
+                    </p>
                     <div className="mt-2">
-                        <RadioGroup
-                            name="dietType"
-                            options={dietTypeOptions}
-                            value={dietType}
-                            onChange={setDietType}
+                        <Range
+                            value={dietTypeOptions.findIndex(opt => opt.value === dietType)}
+                            onChange={(val) => setDietType(dietTypeOptions[val].value)}
+                            min={0}
+                            max={3}
+                            step={1}
+                            markers={['🥗', '🥗🧀', '🥗🥓', '🥩🍗']}
+                            markerSize="3xl"
+                            className="w-full"
                         />
                     </div>
                     <CalculationModal id="diet-modal" title="Diet Type CO₂ Impact">
@@ -94,9 +102,12 @@ function FoodPage() {
 
                 <Card className="bg-white p-6">
                     <div className="flex items-center mb-4">
-                        <h3 className="text-lg font-semibold m-0">Local/Seasonal Food Percentage</h3>
+                        <h3 className="text-lg font-semibold m-0">Local and Seasonal Food</h3>
                         <InfoIcon onClick={() => document.getElementById('local-modal').showModal()} />
                     </div>
+                    <p className="text-sm text-gray-600 mt-2">
+                        How much local and seasonal food do you eat?
+                    </p>
                     <div className="mt-2">
                         <RadioGroup
                             name="localFood"
@@ -121,15 +132,23 @@ function FoodPage() {
 
                 <Card className="bg-white p-6">
                     <div className="flex items-center mb-4">
-                        <h3 className="text-lg font-semibold m-0">Processed Food Consumption</h3>
+                        <h3 className="text-lg font-semibold m-0">Processed Food</h3>
                         <InfoIcon onClick={() => document.getElementById('processed-modal').showModal()} />
+
                     </div>
+                    <p className="text-sm text-gray-600 mt-2">
+                        Are cooking from scratch or buying processed food? Just give a guess based on your diet in the last 12 months.
+                    </p>
                     <div className="mt-2">
-                        <RadioGroup
-                            name="processedFood"
-                            options={processedFoodOptions}
-                            value={processedFood}
-                            onChange={setProcessedFood}
+                        <Range
+                            value={processedFoodOptions.findIndex(opt => opt.value === processedFood)}
+                            onChange={(val) => setProcessedFood(processedFoodOptions[val].value)}
+                            min={0}
+                            max={2}
+                            step={1}
+                            markers={['🌽', '🥫', '🍔']}
+                            markerSize="3xl"
+                            className="w-full"
                         />
                     </div>
                     <CalculationModal id="processed-modal" title="Processed Food Impact">

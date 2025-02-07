@@ -75,7 +75,7 @@ function ConsumptionPage() {
     return (
         <div className="prose container mx-auto p-4 max-w-3xl">
             <h2 className="text-2xl font-bold mb-4">Consumption Habits</h2>
-            <p className="text-gray-600 mb-6">Calculate your CO₂ footprint based on your consumption patterns.</p>
+            <p className="text-xl text-gray-800 font-medium mb-6">See how your consumption patterns are impacting your CO₂ footprint.</p>
 
             <div className="space-y-6">
                 <Card className="bg-white p-6">
