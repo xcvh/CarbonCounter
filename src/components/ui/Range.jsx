@@ -7,6 +7,7 @@ const Range = ({
     max = 100,
     step = 1,
     markers,
+    markerSize = 'xl',
     className = ''
 }) => {
     return (
@@ -21,7 +22,7 @@ const Range = ({
                 step={step}
             />
             {markers && (
-                <div className="flex w-full justify-between px-2 text-xl">
+                <div className={`flex w-full justify-between px-2 text-${markerSize}`}>
                     {markers.map((marker, index) => (
                         <span key={index}>{marker}</span>
                     ))}
@@ -31,4 +32,4 @@ const Range = ({
     );
 };
 
-export default Range; 
+export default Range;
