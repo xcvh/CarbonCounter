@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route } from "react-router-dom";
 import Components from "./Components";
 import Home from "./Home";
 import ResultsPage from "./ResultsPage";
@@ -15,8 +15,8 @@ function App() {
         <main className="relative flex min-h-screen bg-green-800">
             <SidebarProvider>
                 <Sidebar />
-                <div className="flex-1 min-h-screen transition-all duration-300 bg-orange-50 md:rounded-s-3xl">
-                    <div className="p-6">
+                   <div className="flex-1 h-screen transition-all overflow-hidden duration-300 bg-orange-50 md:rounded-s-3xl">
+                      <div className="h-full overflow-auto p-4">
                         <Routes>
                             <Route path="/" element={<Home />} />
                             <Route path="/results" element={<ResultsPage />} />
