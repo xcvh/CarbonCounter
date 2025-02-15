@@ -79,6 +79,7 @@ function ConsumptionPage() {
 
             <div className="space-y-6">
                 <Card className="bg-white p-6">
+
                     <div className="flex items-center mb-4">
                         <h3 className="text-lg font-semibold m-0">Annual Clothing Purchases</h3>
                         <InfoIcon onClick={() => document.getElementById('clothing-modal').showModal()} />

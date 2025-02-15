@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import Components from "./Components";
+import Home from "./Home";
 import ResultsPage from "./ResultsPage";
 import CalculatorPage from "./CalculatorPage";
 import LivingPage from "./LivingPage";
@@ -17,7 +18,7 @@ function App() {
                 <div className="flex-1 min-h-screen transition-all duration-300 bg-orange-50 md:rounded-s-3xl">
                     <div className="p-6">
                         <Routes>
-                            <Route path="/" element={<Components />} />
+                            <Route path="/" element={<Home />} />
                             <Route path="/results" element={<ResultsPage />} />
                             <Route path="/calculator" element={<CalculatorPage />} />
                             <Route path="/calculator/living" element={<LivingPage />} />
