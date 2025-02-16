@@ -1,28 +1,13 @@
+import { Link as RouterLink } from 'react-router-dom';
 import classNames from "classnames";
-import useNavigation from "../hooks/use-navigation";
 
-function Link({ to, children, className, activeClassName }) {
-  const { navigate, currentPath } = useNavigation();
-  const classes = classNames(
-    "text-blue-100",
-    className,
-    currentPath === to && activeClassName,
-  );
-
-  const handleClick = (event) => {
-    if (event.metaKey || event.ctrlKey) {
-      return;
-    }
-
-    event.preventDefault();
-
-    navigate(to);
-  };
+function Link({ to, children, className }) {
+  const classes = classNames("", className);
 
   return (
-    <a className={classes} href={to} onClick={handleClick}>
+    <RouterLink className={classes} to={to}>
       {children}
-    </a>
+    </RouterLink>
   );
 }
 

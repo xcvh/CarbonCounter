@@ -20,6 +20,8 @@ This command will install all the project dependencies defined in the `package.j
 - React
 - Vite
 - Tailwind CSS
+- [daisyUI](https://daisyui.com/)
+- [lucide-react](https://lucide.dev/icons/)
 - [Classnames](https://github.com/JedWatson/classnames#readme)
 - Other project-specific packages
 
