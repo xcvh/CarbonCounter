@@ -87,8 +87,8 @@ function sendToBackend(powerConsumption, ecoElectricity, heatingType, heatingCon
         body: JSON.stringify({ userCode: getCookie("userCode"), powerConsumption: powerConsumption, ecoElectricity: ecoElectricity, heatingType: heatingType, heatingConsumption: heatingConsumption}),
     })
         .then(response => response.json())
-        .then(data => console.log("✅ Antwort:", data))
-        .catch(error => console.error("❌ Fehler:", error));
+        .then(data => console.log("Antwort:", data))
+        .catch(error => console.error("Fehler:", error));
 }
 
 
@@ -127,10 +127,9 @@ function LivingPage() {
     ];
 
     const handleSubmit = () => {
-        // TODO: Calculate carbon footprint based on inputs
         console.log({ powerConsumption, ecoElectricity, heatingType, heatingConsumption });
         sendToBackend(powerConsumption, ecoElectricity, heatingType, heatingConsumption)
-        //navigate('/calculator/mobility');
+        navigate('/calculator/mobility');
     };
 
     return (
