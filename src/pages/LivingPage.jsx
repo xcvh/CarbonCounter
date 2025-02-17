@@ -7,6 +7,7 @@ import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 import Toggle from '../components/ui/Toggle';
 import Dropdown from '../components/ui/Dropdown';
+
 function InfoIcon({ modalId, onClick }) {
     return (
         <button
@@ -51,6 +52,46 @@ function RadioGroup({ name, options, value, onChange }) {
     );
 }
 
+function getCookie(name) {
+    let cookies = document.cookie.split("; ");
+    for (let cookie of cookies) {
+        let [key, value] = cookie.split("=");
+        if (key === name) return value;
+    }
+    return null;
+}
+
+createUserCookie();
+function createUserCookie() {
+    if (!getCookie("userCode")) {
+        fetch("http://localhost:5500/api/user", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }, 
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => document.cookie = "userCode="+data["code"]+"; max-age=3153600000; path=/")
+        .catch(error => console.error("Fehler:", error))
+    }
+}
+
+
+function sendToBackend(powerConsumption, ecoElectricity, heatingType, heatingConsumption) {
+    fetch("http://localhost:5500/api/living-results", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userCode: getCookie("userCode"), powerConsumption: powerConsumption, ecoElectricity: ecoElectricity, heatingType: heatingType, heatingConsumption: heatingConsumption}),
+    })
+        .then(response => response.json())
+        .then(data => console.log("✅ Antwort:", data))
+        .catch(error => console.error("❌ Fehler:", error));
+}
+
+
 function LivingPage() {
     const navigate = useNavigate();
     const [powerConsumption, setPowerConsumption] = useState('');
@@ -59,36 +100,37 @@ function LivingPage() {
     const [heatingConsumption, setHeatingConsumption] = useState('');
 
     const powerConsumptionOptions = [
-        { value: 'under100', label: 'Under 100 kWh/month' },
-        { value: '100-300', label: '100–300 kWh/month' },
-        { value: '300-500', label: '300–500 kWh/month' },
-        { value: 'over500', label: 'Over 500 kWh/month' },
+        { value: '100', label: 'Under 100 kWh/month' },
+        { value: '200', label: '100–300 kWh/month' },
+        { value: '400', label: '300–500 kWh/month' },
+        { value: '500', label: 'Over 500 kWh/month' },
     ];
 
     const ecoElectricityOptions = [
-        { value: 'yes', label: 'Yes, 100%' },
-        { value: 'no', label: 'No' },
+        { value: 'eco', label: 'Yes, 100%' },
+        { value: 'conventional', label: 'No' },
     ];
 
     const heatingTypeOptions = [
-        { value: 'gas', label: 'Natural Gas' },
-        { value: 'oil', label: 'Heating Oil' },
-        { value: 'wood', label: 'Wood/Pellets' },
-        { value: 'heatpump', label: 'Electric (Heat Pump)' },
+        { value: 'naturalGas', label: 'Natural Gas' },
+        { value: 'heatingOil', label: 'Heating Oil' },
+        { value: 'woodOrPallets', label: 'Wood/Pellets' },
+        { value: 'heatingPump', label: 'Electric (Heat Pump)' },
         { value: 'district', label: 'District Heating' },
         { value: 'other', label: 'Other' },
     ];
 
     const heatingConsumptionOptions = [
-        { value: 'under5000', label: 'Under 5,000 kWh/year' },
-        { value: '5000-10000', label: '5,000–10,000 kWh/year' },
-        { value: 'over10000', label: 'Over 10,000 kWh/year' },
+        { value: '5000', label: 'Under 5,000 kWh/year' },
+        { value: '75000', label: '5,000–10,000 kWh/year' },
+        { value: '10000', label: 'Over 10,000 kWh/year' },
     ];
 
     const handleSubmit = () => {
         // TODO: Calculate carbon footprint based on inputs
         console.log({ powerConsumption, ecoElectricity, heatingType, heatingConsumption });
-        navigate('/calculator/mobility');
+        sendToBackend(powerConsumption, ecoElectricity, heatingType, heatingConsumption)
+        //navigate('/calculator/mobility');
     };
 
     return (
@@ -127,7 +169,7 @@ function LivingPage() {
                         </ul>
                     </CalculationModal>
                     <div className="mt-2">
-                        <Toggle label="I use energy from renewable sources" checked={ecoElectricity === 'yes'} onChange={() => setEcoElectricity(ecoElectricity === 'yes' ? 'no' : 'yes')} />
+                        <Toggle label="I use energy from renewable sources" checked={ecoElectricity === 'eco'} onChange={() => setEcoElectricity(ecoElectricity === 'eco' ? 'conventional' : 'eco')} />
                     </div>
 
                 </Card>
