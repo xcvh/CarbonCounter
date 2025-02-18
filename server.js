@@ -104,55 +104,69 @@ app.post('/api/living-results', (req, res) => {
     return res.status(400).json({ error: "Eingabe nicht volständig" });
   }
 
-  let sql = 'SELECT EF FROM questions WHERE id=? OR id=? ORDER BY id ASC'
-  let values = [1, 2]
-  db.all(sql, values, (err, rows) => {
-    if(err) {
-      console.error("Fehler bei der Abfrage")
-      return res.status(500).json({error: "Fehler beim Abfragen des EF"})
-    } else if (rows) {
-      console.log("EF abgefragt:", {rows});
-      
+  //Delete existing results from this questions of this user
+  let sql = 'DELETE FROM quest_results WHERE user_id=? AND (quest_id=1 OR quest_id=2)';
+  let values = [userCode];
+  db.run(sql, values, (err) => {
+    if(err){
+      console.error("Fehler beim Löschen der Daten")
+      return res.status(500).json({error: "Fehler beim Löschen der Daten"})
+    } else {
+      console.log("Daten erfolgreich gelöscht")
 
-      // Calculate electric emission
-      const electricEF = JSON.parse(rows[0]['EF'])[ecoElectricity]
-      const electricEmission = powerConsumption * electricEF
+      let sql = 'SELECT EF FROM questions WHERE id=? OR id=? ORDER BY id ASC'
+      let values = [1, 2]
+      db.all(sql, values, (err, rows) => {
+        if(err) {
+          console.error("Fehler bei der Abfrage")
+          return res.status(500).json({error: "Fehler beim Abfragen des EF"})
+        } else if (rows) {
+          console.log("EF abgefragt:", {rows});
+          
 
-      let sql = 'INSERT INTO quest_results (user_id, quest_id, emission) VALUES (?, ?, ?)'
-      let values = [userCode, 1, electricEmission]
-      db.run(sql, values, (err) => {
-        if(err){
-          console.error("Fehler beim Einfügen der Daten")
-          return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
-        } else {
-          console.log("Daten erfolgreich eingefügt")
-          //res.json({ message: `Ergebnisse für: ${userCode}, ${powerConsumption}, ${ecoElectricity}, ${heatingType}, ${heatingConsumption}` });
-        }
-      })
+          // Calculate electric emission
+          const electricEF = JSON.parse(rows[0]['EF'])[ecoElectricity]
+          const electricEmission = powerConsumption * electricEF
 
-      // Calculate heating emission
-      const heatingEF = JSON.parse(rows[1]['EF'])[heatingType]
-      console.log(heatingEF);
-      let heatingEmission;
-      if(heatingType != "heatingPump") {
-        heatingEmission = heatingConsumption * heatingEF
-      } else {
-        heatingEmission = heatingConsumption * heatingEF * electricEF
-      }
-      sql = 'INSERT INTO quest_results (user_id, quest_id, emission) VALUES (?, ?, ?)'
-      values = [userCode, 2, heatingEmission]
-      db.run(sql, values, (err) => {
-        if(err){
-          console.error("Fehler beim Einfügen der Daten")
-          return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
-        } else {
-          console.log("Daten erfolgreich eingefügt")
-          //res.json({ message: `Ergebnisse für: ${userCode}, ${powerConsumption}, ${ecoElectricity}, ${heatingType}, ${heatingConsumption}` });
+          let sql = 'INSERT INTO quest_results (user_id, quest_id, emission) VALUES (?, ?, ?)'
+          let values = [userCode, 1, electricEmission]
+          db.run(sql, values, (err) => {
+            if(err){
+              console.error("Fehler beim Einfügen der Daten")
+              return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
+            } else {
+              console.log("Daten erfolgreich eingefügt")
+              //res.json({ message: `Ergebnisse für: ${userCode}, ${powerConsumption}, ${ecoElectricity}, ${heatingType}, ${heatingConsumption}` });
+            }
+          })
+
+          // Calculate heating emission
+          const heatingEF = JSON.parse(rows[1]['EF'])[heatingType]
+          console.log(heatingEF);
+          let heatingEmission;
+          if(heatingType != "heatingPump") {
+            heatingEmission = heatingConsumption * heatingEF
+          } else {
+            heatingEmission = heatingConsumption * heatingEF * electricEF
+          }
+          sql = 'INSERT INTO quest_results (user_id, quest_id, emission) VALUES (?, ?, ?)'
+          values = [userCode, 2, heatingEmission]
+          db.run(sql, values, (err) => {
+            if(err){
+              console.error("Fehler beim Einfügen der Daten")
+              return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
+            } else {
+              console.log("Daten erfolgreich eingefügt")
+              //res.json({ message: `Ergebnisse für: ${userCode}, ${powerConsumption}, ${ecoElectricity}, ${heatingType}, ${heatingConsumption}` });
+            }
+          })
         }
       })
     }
-  })
-});
+    })
+})
+
+  
 
 
 
