@@ -4,6 +4,7 @@ const Card = ({
   image,
   imageAlt,
   title,
+  subtitle,
   badges = [],
   badgeColor = "badge-secondary",
   children,
@@ -32,6 +33,7 @@ const Card = ({
             ))}
           </h2>
         )}
+	<h4 className="text-lg font-bold">{subtitle}</h4>
         {children}
         {actions.length > 0 && (
           <div className="card-actions justify-end">

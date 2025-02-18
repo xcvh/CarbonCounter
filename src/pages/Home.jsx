@@ -11,8 +11,12 @@ function Home() {
             <Card
                 image="https://www.conteyor.com/media/pages/library/48e78ddaed-1699614519/carbon-footprint.jpg"
                 imageAlt="CarbonCounterLandingPage"
-                className="bg-white mb-8 p-6 shadow-lg rounded-lg">
-                <h3 className="text-lg font-semibold m-0">Measure Your Carbon Footprint & Make a Difference!</h3>
+		title="Measure Your Carbon Footprint"
+	        subtitle="Make a Difference!"
+        	badges={["🌞"]}
+          	badgeColor="badge-neutral"
+	    >
+	
                 
                 <p className="text-sm text-gray-600 mt-2">
                     Climate change is one of the biggest challenges of our time, but together, we can create a more sustainable future.
@@ -29,6 +33,7 @@ function Home() {
                 </Link>
 
             </Card>
+
         </div>
     );
 

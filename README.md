@@ -23,6 +23,7 @@ This command will install all the project dependencies defined in the `package.j
 - [daisyUI](https://daisyui.com/)
 - [lucide-react](https://lucide.dev/icons/)
 - [Classnames](https://github.com/JedWatson/classnames#readme)
+- Express JS on the backend
 - Other project-specific packages
 
 ### 3. Run the Development Server
