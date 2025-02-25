@@ -1,34 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import Modal from '../components/ui/Modal';
 import Range from '../components/ui/Range';
 import RadioGroup from '../components/ui/RadioGroup';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
+import CalculatorLayout from '../components/layout/CalculatorLayout';
+import QuestionCard from '../components/calculator/QuestionCard';
+import Modal from '../components/ui/Modal';
 
-function InfoIcon({ modalId, onClick }) {
+function CalculationContent({ children }) {
     return (
-        <button
-            onClick={onClick}
-            className="ml-2 text-gray-500 hover:text-gray-700"
-            title="More information"
-        >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-            </svg>
-        </button>
-    );
-}
-
-function CalculationModal({ id, title, children }) {
-    return (
-        <Modal id={id} title={title}>
-            <div className="space-y-4">
-                {children}
-            </div>
-        </Modal>
+        <div className="space-y-4">
+            {children}
+        </div>
     );
 }
 
@@ -59,127 +43,145 @@ function FoodPage() {
     ];
 
     const handleSubmit = () => {
-        // TODO: Calculate carbon footprint based on inputs
         console.log({ dietType, localFood, processedFood });
         navigate('/calculator/consumption');
     };
 
+    // Helper function to determine card status
+    const getCardStatus = (value) => {
+        if (!value) return undefined;
+        return 'completed';
+    };
+
     return (
-        <div className="prose container mx-auto p-4 max-w-3xl">
-            <h2 className="text-2xl font-bold mb-4">Food & Diet</h2>
-            <p className="text-xl text-gray-800 font-medium mb-6">See how your diet is impacting your CO₂ footprint.</p>
+        <CalculatorLayout
+            title="Food & Diet"
+            description="See how your diet is impacting your CO₂ footprint."
+            previousPage="/calculator/mobility"
+            nextPage="/calculator/consumption"
+            onNext={handleSubmit}
+        >
+            <QuestionCard
+                title="Diet Type"
+                description="How much meat do you eat? Are you vegan, vegetarian, or on a mixed diet?"
+                icon="🥗"
+                image="images/calculator/diet-type.jpg"
+                imageAlt="Various diet types from vegan to meat-based"
+                badge={dietType ? dietTypeOptions.find(opt => opt.value === dietType)?.label : 'Not Selected'}
+                badgeColor={dietType ? 'badge-primary' : 'badge-ghost'}
+                status={getCardStatus(dietType)}
+                highlight={!dietType}
+                actions={[
+                    dietType === 'vegan' && '🌱 Low Impact',
+                    dietType === 'mixed_high' && '⚠️ High Impact'
+                ].filter(Boolean)}
+                modalId="diet-modal"
+                modalContent={
+                    <Modal id="diet-modal" title="Diet Type CO₂ Impact">
+                        <CalculationContent>
+                            <p>Annual CO₂ emissions by diet type:</p>
+                            <ul className="list-disc pl-4 space-y-2">
+                                <li>Vegan: <InlineMath>{"1.0"}</InlineMath> tonnes/year</li>
+                                <li>Vegetarian: <InlineMath>{"1.5"}</InlineMath> tonnes/year</li>
+                                <li>Mixed Diet: <InlineMath>{"2.0-3.0"}</InlineMath> tonnes/year</li>
+                            </ul>
+                        </CalculationContent>
+                    </Modal>
+                }
+            >
+                <Range
+                    value={dietTypeOptions.findIndex(opt => opt.value === dietType)}
+                    onChange={(val) => setDietType(dietTypeOptions[val].value)}
+                    min={0}
+                    max={3}
+                    step={1}
+                    markers={['🥗', '🥗🧀', '🥗🥓', '🥩🍗']}
+                    markerSize="3xl"
+                    className="w-full"
+                />
+            </QuestionCard>
 
-            <div className="space-y-6">
-                <Card className="bg-white p-6">
-                    <div className="flex items-center mb-4">
-                        <h3 className="text-lg font-semibold m-0">Diet Type</h3>
-                        <InfoIcon onClick={() => document.getElementById('diet-modal').showModal()} />
-                    </div>
-                    <p className="text-sm text-gray-600 mt-2">
-                        How much meat do you eat? Are you vegan, vegetarian, or on a mixed diet? Or even a carnivore?
-                    </p>
-                    <div className="mt-2">
-                        <Range
-                            value={dietTypeOptions.findIndex(opt => opt.value === dietType)}
-                            onChange={(val) => setDietType(dietTypeOptions[val].value)}
-                            min={0}
-                            max={3}
-                            step={1}
-                            markers={['🥗', '🥗🧀', '🥗🥓', '🥩🍗']}
-                            markerSize="3xl"
-                            className="w-full"
-                        />
-                    </div>
-                    <CalculationModal id="diet-modal" title="Diet Type CO₂ Impact">
-                        <p>Annual CO₂ emissions by diet type:</p>
-                        <ul className="list-disc pl-4 space-y-2">
-                            <li>Vegan: <InlineMath>{"1.0"}</InlineMath> tonnes/year</li>
-                            <li>Vegetarian: <InlineMath>{"1.5"}</InlineMath> tonnes/year</li>
-                            <li>Mixed Diet: <InlineMath>{"2.0-3.0"}</InlineMath> tonnes/year</li>
-                        </ul>
-                    </CalculationModal>
-                </Card>
+            <QuestionCard
+                title="Local and Seasonal Food"
+                description="How much local and seasonal food do you eat?"
+                icon="🌾"
+                image="images/calculator/local-food.jpg"
+                imageAlt="Local and seasonal produce"
+                badge={localFood ? localFoodOptions.find(opt => opt.value === localFood)?.label : 'Not Selected'}
+                badgeColor={localFood ? 'badge-secondary' : 'badge-ghost'}
+                status={getCardStatus(localFood)}
+                highlight={!localFood && dietType}
+                actions={[
+                    localFood === 'over75' && '🌱 Eco-friendly',
+                    localFood === 'under25' && '🌍 High Food Miles'
+                ].filter(Boolean)}
+                modalId="local-modal"
+                modalContent={
+                    <Modal id="local-modal" title="Local Food Impact">
+                        <CalculationContent>
+                            <p>The CO₂ reduction from local/seasonal food is calculated as:</p>
+                            <BlockMath>
+                                {"CO_2 = Diet_{base} \\times (1 - Local_{percentage} \\times 0.3)"}
+                            </BlockMath>
+                            <p>Where:</p>
+                            <ul className="list-disc pl-4">
+                                <li><InlineMath>{"Diet_{base}"}</InlineMath> = Base emissions from diet type</li>
+                                <li><InlineMath>{"Local_{percentage}"}</InlineMath> = Percentage of local/seasonal food</li>
+                                <li>Up to 50% reduction possible with high use of local/seasonal products</li>
+                            </ul>
+                        </CalculationContent>
+                    </Modal>
+                }
+            >
+                <RadioGroup
+                    name="localFood"
+                    options={localFoodOptions}
+                    value={localFood}
+                    onChange={setLocalFood}
+                />
+            </QuestionCard>
 
-                <Card className="bg-white p-6">
-                    <div className="flex items-center mb-4">
-                        <h3 className="text-lg font-semibold m-0">Local and Seasonal Food</h3>
-                        <InfoIcon onClick={() => document.getElementById('local-modal').showModal()} />
-                    </div>
-                    <p className="text-sm text-gray-600 mt-2">
-                        How much local and seasonal food do you eat?
-                    </p>
-                    <div className="mt-2">
-                        <RadioGroup
-                            name="localFood"
-                            options={localFoodOptions}
-                            value={localFood}
-                            onChange={setLocalFood}
-                        />
-                    </div>
-                    <CalculationModal id="local-modal" title="Local Food Impact">
-                        <p>The CO₂ reduction from local/seasonal food is calculated as:</p>
-                        <BlockMath>
-                            {"CO_2 = Diet_{base} \\times (1 - Local_{percentage} \\times 0.3)"}
-                        </BlockMath>
-                        <p>Where:</p>
-                        <ul className="list-disc pl-4">
-                            <li><InlineMath>{"Diet_{base}"}</InlineMath> = Base emissions from diet type</li>
-                            <li><InlineMath>{"Local_{percentage}"}</InlineMath> = Percentage of local/seasonal food</li>
-                            <li>Up to 50% reduction possible with high use of local/seasonal products</li>
-                        </ul>
-                    </CalculationModal>
-                </Card>
-
-                <Card className="bg-white p-6">
-                    <div className="flex items-center mb-4">
-                        <h3 className="text-lg font-semibold m-0">Processed Food</h3>
-                        <InfoIcon onClick={() => document.getElementById('processed-modal').showModal()} />
-
-                    </div>
-                    <p className="text-sm text-gray-600 mt-2">
-                        Are cooking from scratch or buying processed food? Just give a guess based on your diet in the last 12 months.
-                    </p>
-                    <div className="mt-2">
-                        <Range
-                            value={processedFoodOptions.findIndex(opt => opt.value === processedFood)}
-                            onChange={(val) => setProcessedFood(processedFoodOptions[val].value)}
-                            min={0}
-                            max={2}
-                            step={1}
-                            markers={['🌽', '🥫', '🍔']}
-                            markerSize="3xl"
-                            className="w-full"
-                        />
-                    </div>
-                    <CalculationModal id="processed-modal" title="Processed Food Impact">
-                        <p>Additional annual CO₂ emissions from processed foods:</p>
-                        <ul className="list-disc pl-4 space-y-2">
-                            <li>High: <InlineMath>{"200"}</InlineMath> kg CO₂/year</li>
-                            <li>Medium: <InlineMath>{"130"}</InlineMath> kg CO₂/year</li>
-                            <li>Low: <InlineMath>{"50"}</InlineMath> kg CO₂/year</li>
-                        </ul>
-                        <p className="text-sm text-gray-600 mt-2">Example: A frozen pizza produces about 5 kg CO₂e</p>
-                    </CalculationModal>
-                </Card>
-
-                <div className="flex justify-between mt-8">
-                    <Button
-                        variant="ghost"
-                        onClick={() => navigate('/calculator/mobility')}
-                        className="px-6 py-2"
-                    >
-                        ← Back to Mobility
-                    </Button>
-                    <Button
-                        variant="primary"
-                        onClick={handleSubmit}
-                        className="px-6 py-2"
-                    >
-                        Continue to Consumption →
-                    </Button>
-                </div>
-            </div>
-        </div>
+            <QuestionCard
+                title="Processed Food"
+                description="Are you cooking from scratch or buying processed food? Just give a guess based on your diet in the last 12 months."
+                icon="🥫"
+                image="images/calculator/processed-food.jpg"
+                imageAlt="Processed vs fresh food comparison"
+                badge={processedFood ? processedFoodOptions.find(opt => opt.value === processedFood)?.label : 'Not Selected'}
+                badgeColor={processedFood ? 'badge-accent' : 'badge-ghost'}
+                status={getCardStatus(processedFood)}
+                highlight={!processedFood && localFood && dietType}
+                actions={[
+                    processedFood === 'low' && '🌱 Fresh Food',
+                    processedFood === 'high' && '⚠️ High Processing'
+                ].filter(Boolean)}
+                modalId="processed-modal"
+                modalContent={
+                    <Modal id="processed-modal" title="Processed Food Impact">
+                        <CalculationContent>
+                            <p>Additional annual CO₂ emissions from processed foods:</p>
+                            <ul className="list-disc pl-4 space-y-2">
+                                <li>High: <InlineMath>{"200"}</InlineMath> kg CO₂/year</li>
+                                <li>Medium: <InlineMath>{"130"}</InlineMath> kg CO₂/year</li>
+                                <li>Low: <InlineMath>{"50"}</InlineMath> kg CO₂/year</li>
+                            </ul>
+                            <p className="text-sm text-gray-600 mt-2">Example: A frozen pizza produces about 5 kg CO₂e</p>
+                        </CalculationContent>
+                    </Modal>
+                }
+            >
+                <Range
+                    value={processedFoodOptions.findIndex(opt => opt.value === processedFood)}
+                    onChange={(val) => setProcessedFood(processedFoodOptions[val].value)}
+                    min={0}
+                    max={2}
+                    step={1}
+                    markers={['🌽', '🥫', '🍔']}
+                    markerSize="3xl"
+                    className="w-full"
+                />
+            </QuestionCard>
+        </CalculatorLayout>
     );
 }
 

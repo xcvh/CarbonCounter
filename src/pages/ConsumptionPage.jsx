@@ -1,33 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import Modal from '../components/ui/Modal';
 import RadioGroup from '../components/ui/RadioGroup';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
+import CalculatorLayout from '../components/layout/CalculatorLayout';
+import QuestionCard from '../components/calculator/QuestionCard';
+import Modal from '../components/ui/Modal';
 
-function InfoIcon({ modalId, onClick }) {
+function CalculationContent({ children }) {
     return (
-        <button
-            onClick={onClick}
-            className="ml-2 text-gray-500 hover:text-gray-700"
-            title="More information"
-        >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-            </svg>
-        </button>
-    );
-}
-
-function CalculationModal({ id, title, children }) {
-    return (
-        <Modal id={id} title={title}>
-            <div className="space-y-4">
-                {children}
-            </div>
-        </Modal>
+        <div className="space-y-4">
+            {children}
+        </div>
     );
 }
 
@@ -67,143 +51,199 @@ function ConsumptionPage() {
     ];
 
     const handleSubmit = () => {
-        // TODO: Calculate carbon footprint based on inputs
         console.log({ clothingAmount, usedClothing, onlineOrders, foodWaste });
         navigate('/results');
     };
 
+    // Helper function to determine card status
+    const getCardStatus = (value) => {
+        if (!value) return undefined;
+        return 'completed';
+    };
+
     return (
-        <div className="prose container mx-auto p-4 max-w-3xl">
-            <h2 className="text-2xl font-bold mb-4">Consumption Habits</h2>
-            <p className="text-xl text-gray-800 font-medium mb-6">See how your consumption patterns are impacting your CO₂ footprint.</p>
-
-            <div className="space-y-6">
-                <Card className="bg-white p-6">
-
-                    <div className="flex items-center mb-4">
-                        <h3 className="text-lg font-semibold m-0">Annual Clothing Purchases</h3>
-                        <InfoIcon onClick={() => document.getElementById('clothing-modal').showModal()} />
-                    </div>
-                    <div className="mt-2">
-                        <RadioGroup
-                            name="clothingAmount"
-                            options={clothingAmountOptions}
-                            value={clothingAmount}
-                            onChange={setClothingAmount}
-                        />
-                    </div>
-                    <CalculationModal id="clothing-modal" title="Clothing CO₂ Impact">
-                        <p>The CO₂ emissions from clothing are calculated as:</p>
-                        <BlockMath>
-                            {"CO_2 = Items \\times 17\\text{ kg}"}
-                        </BlockMath>
-                        <p>Where:</p>
-                        <ul className="list-disc pl-4">
-                            <li><InlineMath>{"Items"}</InlineMath> = Number of clothing items purchased per year</li>
-                            <li>Each item produces approximately 17 kg of CO₂</li>
-                        </ul>
-                    </CalculationModal>
-                </Card>
-
-                <Card className="bg-white p-6">
-                    <div className="flex items-center mb-4">
-                        <h3 className="text-lg font-semibold m-0">Second-hand Clothing</h3>
-                        <InfoIcon onClick={() => document.getElementById('used-modal').showModal()} />
-                    </div>
-                    <div className="mt-2">
-                        <RadioGroup
-                            name="usedClothing"
-                            options={usedClothingOptions}
-                            value={usedClothing}
-                            onChange={setUsedClothing}
-                        />
-                    </div>
-                    <CalculationModal id="used-modal" title="Second-hand Impact">
-                        <p>The CO₂ reduction from second-hand clothing is calculated as:</p>
-                        <BlockMath>
-                            {"CO_2 = Clothing_{CO_2} \\times (1 - Usage_{percentage} \\times 0.5)"}
-                        </BlockMath>
-                        <p>Where:</p>
-                        <ul className="list-disc pl-4">
-                            <li>Always: 100% reduction</li>
-                            <li>Often: 50% reduction</li>
-                            <li>Rarely: 10% reduction</li>
-                            <li>Never: 0% reduction</li>
-                        </ul>
-                        <p>Second-hand clothing can save up to 60% CO₂ emissions</p>
-                    </CalculationModal>
-                </Card>
-
-                <Card className="bg-white p-6">
-                    <div className="flex items-center mb-4">
-                        <h3 className="text-lg font-semibold m-0">Online Shopping Frequency</h3>
-                        <InfoIcon onClick={() => document.getElementById('online-modal').showModal()} />
-                    </div>
-                    <div className="mt-2">
-                        <RadioGroup
-                            name="onlineOrders"
-                            options={onlineOrderOptions}
-                            value={onlineOrders}
-                            onChange={setOnlineOrders}
-                        />
-                    </div>
-                    <CalculationModal id="online-modal" title="Online Shopping Impact">
-                        <p>The CO₂ emissions from online shopping are calculated as:</p>
-                        <BlockMath>
-                            {"CO_2 = Orders \\times 1\\text{ kg}"}
-                        </BlockMath>
-                        <p>Where:</p>
-                        <ul className="list-disc pl-4">
-                            <li><InlineMath>{"Orders"}</InlineMath> = Number of online orders per month</li>
-                            <li>Each order produces approximately 1 kg of CO₂</li>
-                        </ul>
-                    </CalculationModal>
-                </Card>
-
-                <Card className="bg-white p-6">
-                    <div className="flex items-center mb-4">
-                        <h3 className="text-lg font-semibold m-0">Food Waste</h3>
-                        <InfoIcon onClick={() => document.getElementById('waste-modal').showModal()} />
-                    </div>
-                    <div className="mt-2">
-                        <RadioGroup
-                            name="foodWaste"
-                            options={foodWasteOptions}
-                            value={foodWaste}
-                            onChange={setFoodWaste}
-                        />
-                    </div>
-                    <CalculationModal id="waste-modal" title="Food Waste Impact">
-                        <p>The CO₂ emissions from food waste are calculated as:</p>
-                        <BlockMath>
-                            {"CO_2 = Weight \\times 4.5\\text{ kg}"}
-                        </BlockMath>
-                        <p>Where:</p>
-                        <ul className="list-disc pl-4">
-                            <li><InlineMath>{"Weight"}</InlineMath> = Amount of food waste in kg per month</li>
-                            <li>Each kg of food waste produces 4.5 kg of CO₂e</li>
-                        </ul>
-                    </CalculationModal>
-                </Card>
-
-                <div className="flex justify-between mt-8">
-                    <Button
-                        variant="ghost"
-                        onClick={() => navigate('/calculator/food')}
-                        className="px-6 py-2"
-                    >
-                        ← Back to Food
-                    </Button>
-                    <Button
-                        variant="primary"
-                        onClick={handleSubmit}
-                        className="px-6 py-2"
-                    >
-                        View Results →
-                    </Button>
+        <CalculatorLayout
+            title="Consumption & Waste"
+            description="See how your consumption and waste habits impact your CO₂ footprint."
+            previousPage="/calculator/food"
+            nextPage="/calculator/living"
+            onNext={handleSubmit}
+        >
+            <QuestionCard
+                title="Clothing & Shopping"
+                description="How often do you buy new clothes and other items?"
+                icon="👕"
+                image="images/calculator/clothing-habits.jpg"
+                imageAlt="Sustainable fashion and shopping"
+                badge={clothingAmount ? clothingAmountOptions.find(opt => opt.value === clothingAmount)?.label : 'Not Selected'}
+                badgeColor={clothingAmount ? 'badge-primary' : 'badge-ghost'}
+                status={getCardStatus(clothingAmount)}
+                highlight={!clothingAmount}
+                actions={[
+                    clothingAmount === '1-2' && '🌱 Sustainable',
+                    clothingAmount === '3-6' && '🌱 Sustainable',
+                    clothingAmount === '7-10' && '🌱 Sustainable',
+                    clothingAmount === 'over10' && '⚠️ High Consumption'
+                ].filter(Boolean)}
+                modalId="clothing-modal"
+                modalContent={
+                    <Modal id="clothing-modal" title="Clothing CO₂ Impact">
+                        <CalculationContent>
+                            <p>The CO₂ emissions from clothing are calculated as:</p>
+                            <BlockMath>
+                                {"CO_2 = Items \\times 17\\text{ kg}"}
+                            </BlockMath>
+                            <p>Where:</p>
+                            <ul className="list-disc pl-4">
+                                <li><InlineMath>{"Items"}</InlineMath> = Number of clothing items purchased per year</li>
+                                <li>Each item produces approximately 17 kg of CO₂</li>
+                            </ul>
+                        </CalculationContent>
+                    </Modal>
+                }
+            >
+                <div className="mt-2">
+                    <RadioGroup
+                        name="clothingAmount"
+                        options={clothingAmountOptions}
+                        value={clothingAmount}
+                        onChange={setClothingAmount}
+                    />
                 </div>
-            </div>
-        </div>
+            </QuestionCard>
+
+            <QuestionCard
+                title="Second-hand Clothing"
+                description="How often do you buy second-hand clothes?"
+                icon="👕"
+                image="images/calculator/second-hand-clothing.jpg"
+                imageAlt="Second-hand clothing"
+                badge={usedClothing ? usedClothingOptions.find(opt => opt.value === usedClothing)?.label : 'Not Selected'}
+                badgeColor={usedClothing ? 'badge-secondary' : 'badge-ghost'}
+                status={getCardStatus(usedClothing)}
+                highlight={!usedClothing}
+                actions={[
+                    usedClothing === 'always' && '🌱 Zero Waste',
+                    usedClothing === 'often' && '🌱 Sustainable',
+                    usedClothing === 'rarely' && '⚠️ High Waste',
+                    usedClothing === 'never' && '⚠️ High Waste'
+                ].filter(Boolean)}
+                modalId="used-modal"
+                modalContent={
+                    <Modal id="used-modal" title="Second-hand Clothing Impact">
+                        <CalculationContent>
+                            <p>The CO₂ reduction from second-hand clothing is calculated as:</p>
+                            <BlockMath>
+                                {"CO_2 = Clothing_{CO_2} \\times (1 - Usage_{percentage} \\times 0.5)"}
+                            </BlockMath>
+                            <p>Where:</p>
+                            <ul className="list-disc pl-4">
+                                <li>Always: 100% reduction</li>
+                                <li>Often: 50% reduction</li>
+                                <li>Rarely: 10% reduction</li>
+                                <li>Never: 0% reduction</li>
+                            </ul>
+                            <p>Second-hand clothing can save up to 60% CO₂ emissions</p>
+                        </CalculationContent>
+                    </Modal>
+                }
+            >
+                <div className="mt-2">
+                    <RadioGroup
+                        name="usedClothing"
+                        options={usedClothingOptions}
+                        value={usedClothing}
+                        onChange={setUsedClothing}
+                    />
+                </div>
+            </QuestionCard>
+
+            <QuestionCard
+                title="Online Shopping Frequency"
+                description="How often do you shop online?"
+                icon="🌐"
+                image="images/calculator/online-shopping.jpg"
+                imageAlt="Online shopping"
+                badge={onlineOrders ? onlineOrderOptions.find(opt => opt.value === onlineOrders)?.label : 'Not Selected'}
+                badgeColor={onlineOrders ? 'badge-accent' : 'badge-ghost'}
+                status={getCardStatus(onlineOrders)}
+                highlight={!onlineOrders}
+                actions={[
+                    onlineOrders === 'never' && '🌱 Sustainable',
+                    onlineOrders === '1-2' && '🌱 Sustainable',
+                    onlineOrders === '3-5' && '🌱 Sustainable',
+                    onlineOrders === 'over5' && '⚠️ High Consumption'
+                ].filter(Boolean)}
+                modalId="online-modal"
+                modalContent={
+                    <Modal id="online-modal" title="Online Shopping Impact">
+                        <CalculationContent>
+                            <p>The CO₂ emissions from online shopping are calculated as:</p>
+                            <BlockMath>
+                                {"CO_2 = Orders \\times 1\\text{ kg}"}
+                            </BlockMath>
+                            <p>Where:</p>
+                            <ul className="list-disc pl-4">
+                                <li><InlineMath>{"Orders"}</InlineMath> = Number of online orders per month</li>
+                                <li>Each order produces approximately 1 kg of CO₂</li>
+                            </ul>
+                        </CalculationContent>
+                    </Modal>
+                }
+            >
+                <div className="mt-2">
+                    <RadioGroup
+                        name="onlineOrders"
+                        options={onlineOrderOptions}
+                        value={onlineOrders}
+                        onChange={setOnlineOrders}
+                    />
+                </div>
+            </QuestionCard>
+
+            <QuestionCard
+                title="Food Waste"
+                description="How much food waste do you generate weekly?"
+                icon="🍽️"
+                image="images/calculator/food-waste.jpg"
+                imageAlt="Food waste"
+                badge={foodWaste ? foodWasteOptions.find(opt => opt.value === foodWaste)?.label : 'Not Selected'}
+                badgeColor={foodWaste ? 'badge-accent' : 'badge-ghost'}
+                status={getCardStatus(foodWaste)}
+                highlight={!foodWaste}
+                actions={[
+                    foodWaste === 'none' && '🌱 Zero Waste',
+                    foodWaste === 'under1' && '🌱 Sustainable',
+                    foodWaste === '1-3' && '⚠️ High Waste',
+                    foodWaste === 'over3' && '⚠️ High Impact'
+                ].filter(Boolean)}
+                modalId="waste-modal"
+                modalContent={
+                    <Modal id="waste-modal" title="Food Waste Impact">
+                        <CalculationContent>
+                            <p>The CO₂ emissions from food waste are calculated as:</p>
+                            <BlockMath>
+                                {"CO_2 = Weight \\times 4.5\\text{ kg}"}
+                            </BlockMath>
+                            <p>Where:</p>
+                            <ul className="list-disc pl-4">
+                                <li><InlineMath>{"Weight"}</InlineMath> = Amount of food waste in kg per month</li>
+                                <li>Each kg of food waste produces 4.5 kg of CO₂e</li>
+                            </ul>
+                        </CalculationContent>
+                    </Modal>
+                }
+            >
+                <div className="mt-2">
+                    <RadioGroup
+                        name="foodWaste"
+                        options={foodWasteOptions}
+                        value={foodWaste}
+                        onChange={setFoodWaste}
+                    />
+                </div>
+            </QuestionCard>
+        </CalculatorLayout>
     );
 }
 

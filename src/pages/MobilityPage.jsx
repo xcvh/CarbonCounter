@@ -1,34 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import Modal from '../components/ui/Modal';
-import 'katex/dist/katex.min.css';
-import { InlineMath, BlockMath } from 'react-katex';
-import RadioGroup from '../components/ui/RadioGroup';
 import Range from '../components/ui/Range';
 import Dropdown from '../components/ui/Dropdown';
-function InfoIcon({ modalId, onClick }) {
-    return (
-        <button
-            onClick={onClick}
-            className="ml-2 text-gray-500 hover:text-gray-700"
-            title="More information"
-        >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-            </svg>
-        </button>
-    );
-}
+import 'katex/dist/katex.min.css';
+import { InlineMath, BlockMath } from 'react-katex';
+import CalculatorLayout from '../components/layout/CalculatorLayout';
+import QuestionCard from '../components/calculator/QuestionCard';
+import Modal from '../components/ui/Modal';
 
-function CalculationModal({ id, title, children }) {
+function CalculationContent({ children }) {
     return (
-        <Modal id={id} title={title}>
-            <div className="space-y-4">
-                {children}
-            </div>
-        </Modal>
+        <div className="space-y-4">
+            {children}
+        </div>
     );
 }
 
@@ -38,13 +22,6 @@ function MobilityPage() {
     const [carType, setCarType] = useState('');
     const [publicTransport, setPublicTransport] = useState('');
     const [flights, setFlights] = useState('');
-
-    const carKilometersOptions = [
-        { value: 'under5000', label: 'Under 5,000 km' },
-        { value: '5000-10000', label: '5,000–10,000 km' },
-        { value: '10000-15000', label: '10,000–15,000 km' },
-        { value: 'over15000', label: 'Over 15,000 km' },
-    ];
 
     const carTypeOptions = [
         { value: 'petrol', label: 'Petrol' },
@@ -69,135 +46,162 @@ function MobilityPage() {
     ];
 
     const handleSubmit = () => {
-        // TODO: Calculate carbon footprint based on inputs
         console.log({ carKilometers, carType, publicTransport, flights });
         navigate('/calculator/food');
     };
 
+    // Helper function to determine card status
+    const getCardStatus = (value) => {
+        if (!value) return undefined;
+        return 'completed';
+    };
+
     return (
-        <div className="prose container mx-auto p-4 max-w-3xl">
-            <h2 className="text-2xl font-bold mb-4">Mobility</h2>
-            <p className="text-xl text-gray-800 font-medium mb-6">See how your transportation choices are impacting your CO₂ footprint.</p>
-
-            <div className="space-y-6">
-                <Card className="bg-white p-6">
-                    <div className="flex items-center mb-4">
-                        <h3 className="text-lg font-semibold m-0">Car Usage & Type</h3>
-                        <InfoIcon onClick={() => document.getElementById('car-modal').showModal()} />
-                    </div>
-
-                    <div className="mt-4">
-                        <Dropdown
-                            trigger={carTypeOptions.find(opt => opt.value === carType)?.label || "Select your vehicle type"}
-                            items={carTypeOptions.map(option => ({
-                                label: option.label,
-                                onClick: () => setCarType(option.value)
-                            }))}
-                        />
-                    </div>
-
-                    <div className="mt-2">
-                        <h4 className="text-md font-medium mb-2">Annual Distance in km</h4>
-                        <Range
-                            value={carKilometers}
-                            onChange={setCarKilometers}
-                            min={5000}
-                            max={20000}
-                            step={5000}
-                            markers={['<5000', '<10000', '<15000', '>15000']}
-                            markerSize="lg"
-                        />
-                    </div>
-
-                    <CalculationModal id="car-modal" title="Car Usage & Emissions">
-                        <p>The CO₂ balance for car usage is calculated as follows:</p>
-                        <BlockMath>
-                            {"CO_2 = km \\times EF_{car}"}
-                        </BlockMath>
-                        <p>Where:</p>
-                        <ul className="list-disc pl-4">
-                            <li><InlineMath>{"km"}</InlineMath> = Annual kilometers driven</li>
-                            <li><InlineMath>{"EF_{car}"}</InlineMath> = Emission factor based on car type</li>
-                        </ul>
-                        <p className="mt-4">Emission factors by vehicle type:</p>
-                        <ul className="list-disc pl-4 space-y-2">
-                            <li>Petrol: <InlineMath>{"0.200 \\frac{kg}{km}"}</InlineMath></li>
-                            <li>Diesel/LPG: <InlineMath>{"0.185 \\frac{kg}{km}"}</InlineMath></li>
-                            <li>Hybrid: <InlineMath>{"0.165 \\frac{kg}{km}"}</InlineMath></li>
-                            <li>Natural Gas: <InlineMath>{"0.174 \\frac{kg}{km}"}</InlineMath></li>
-                            <li>Electric: <InlineMath>{"0.150 \\frac{kg}{km}"}</InlineMath></li>
-                        </ul>
-                    </CalculationModal>
-                </Card>
-
-                <Card className="bg-white p-6">
-                    <div className="flex items-center mb-4">
-                        <h3 className="text-lg font-semibold m-0">Urban Transportation</h3>
-                        <InfoIcon onClick={() => document.getElementById('transport-modal').showModal()} />
-                    </div>
-                    <div className="mt-2">
-                        <p className="text-gray-600 mb-2">How do you usually get around your city?</p>
-                        <Range
-                            value={publicTransportOptions.findIndex(opt => opt.value === publicTransport)}
-                            onChange={(index) => setPublicTransport(publicTransportOptions[index].value)}
-                            min={0}
-                            max={2}
-                            step={1}
-                            markers={['🚴‍♂️', '🛴', '🚌']}
-                            markerSize="3xl"
-                        />
-                    </div>
-                    <CalculationModal id="transport-modal" title="Urban Transportation Impact">
-                        <p>Environmental impact of different urban transportation modes:</p>
-                        <ul className="list-disc pl-4 space-y-2">
-                            <li>Biking/Walking: Zero direct emissions</li>
-                            <li>E-scooter/E-bike: <InlineMath>{"0.015 \\frac{kg}{km}"}</InlineMath> (includes charging)</li>
-                            <li>Bus/Metro: <InlineMath>{"0.090 \\frac{kg}{km}"}</InlineMath> (averaged)</li>
-                            <li>Mixed usage: <InlineMath>{"0.045 \\frac{kg}{km}"}</InlineMath> (estimated average)</li>
-                        </ul>
-                    </CalculationModal>
-                </Card>
-
-                <Card className="bg-white p-6">
-                    <div className="flex items-center mb-4">
-                        <h3 className="text-lg font-semibold m-0">Air Travel</h3>
-                        <InfoIcon onClick={() => document.getElementById('flight-modal').showModal()} />
-                    </div>
-                    <div className="mt-2">
-                        <RadioGroup
-                            name="flights"
-                            options={flightOptions}
-                            value={flights}
-                            onChange={setFlights}
-                        />
-                    </div>
-                    <CalculationModal id="flight-modal" title="Flight Emissions">
-                        <p>CO₂ emissions per flight:</p>
-                        <ul className="list-disc pl-4 space-y-2">
-                            <li>Short-haul flight: <InlineMath>{"0.25"}</InlineMath> tonnes CO₂ per flight</li>
-                            <li>Long-haul flight: <InlineMath>{"1.00"}</InlineMath> tonnes CO₂ per flight</li>
-                        </ul>
-                    </CalculationModal>
-                </Card>
-
-                <div className="flex justify-between mt-8">
-                    <Button
-                        variant="ghost"
-                        onClick={() => navigate('/calculator/living')}
-                        className="px-6 py-2"
-                    >
-                        ← Back to Living
-                    </Button>
-                    <Button
-                        variant="primary"
-                        onClick={handleSubmit}
-                        className="px-6 py-2"
-                    >
-                        Continue to Food →
-                    </Button>
+        <CalculatorLayout
+            title="Mobility"
+            description="See how your transportation choices are impacting your CO₂ footprint."
+            previousPage="/calculator/living"
+            nextPage="/calculator/food"
+            onNext={handleSubmit}
+        >
+            <QuestionCard
+                title="Car Usage & Type"
+                icon="🚗"
+                image="images/calculator/car-usage.jpg"
+                imageAlt="Electric car charging"
+                badge={carType ? carTypeOptions.find(opt => opt.value === carType)?.label : 'Not Selected'}
+                badgeColor={carType ? 'badge-primary' : 'badge-ghost'}
+                status={getCardStatus(carType && carKilometers)}
+                highlight={!carType}
+                actions={[
+                    carType === 'electric' && '⚡ Low Emissions',
+                    carType === 'hybrid' && '🔋 Hybrid Power'
+                ].filter(Boolean)}
+                modalId="car-modal"
+                modalContent={
+                    <Modal id="car-modal" title="Car Usage & Emissions">
+                        <CalculationContent>
+                            <p>The CO₂ balance for car usage is calculated as follows:</p>
+                            <BlockMath>
+                                {"CO_2 = km \\times EF_{car}"}
+                            </BlockMath>
+                            <p>Where:</p>
+                            <ul className="list-disc pl-4">
+                                <li><InlineMath>{"km"}</InlineMath> = Annual kilometers driven</li>
+                                <li><InlineMath>{"EF_{car}"}</InlineMath> = Emission factor based on car type</li>
+                            </ul>
+                            <p className="mt-4">Emission factors by vehicle type:</p>
+                            <ul className="list-disc pl-4 space-y-2">
+                                <li>Petrol: <InlineMath>{"0.200 \\frac{kg}{km}"}</InlineMath></li>
+                                <li>Diesel/LPG: <InlineMath>{"0.185 \\frac{kg}{km}"}</InlineMath></li>
+                                <li>Hybrid: <InlineMath>{"0.165 \\frac{kg}{km}"}</InlineMath></li>
+                                <li>Natural Gas: <InlineMath>{"0.174 \\frac{kg}{km}"}</InlineMath></li>
+                                <li>Electric: <InlineMath>{"0.150 \\frac{kg}{km}"}</InlineMath></li>
+                            </ul>
+                        </CalculationContent>
+                    </Modal>
+                }
+            >
+                <div className="mt-4">
+                    <Dropdown
+                        trigger={carTypeOptions.find(opt => opt.value === carType)?.label || "Select your vehicle type"}
+                        items={carTypeOptions.map(option => ({
+                            label: option.label,
+                            onClick: () => setCarType(option.value)
+                        }))}
+                    />
                 </div>
-            </div>
-        </div>
+
+                <div className="mt-2">
+                    <h4 className="text-md font-medium mb-2">Annual Distance in km</h4>
+                    <Range
+                        value={carKilometers}
+                        onChange={setCarKilometers}
+                        min={5000}
+                        max={20000}
+                        step={5000}
+                        markers={['<5000', '<10000', '<15000', '>15000']}
+                        markerSize="lg"
+                    />
+                </div>
+            </QuestionCard>
+
+            <QuestionCard
+                title="Urban Transportation"
+                description="How do you usually get around your city?"
+                icon="🚊"
+                image="images/calculator/urban-transport.jpg"
+                imageAlt="Public transportation"
+                badge={publicTransport ? publicTransportOptions.find(opt => opt.value === publicTransport)?.label : 'Not Selected'}
+                badgeColor={publicTransport ? 'badge-secondary' : 'badge-ghost'}
+                status={getCardStatus(publicTransport)}
+                highlight={!publicTransport && !carType}
+                actions={[
+                    publicTransport === 'bike_walk' && '🌱 Zero Emissions',
+                    publicTransport === 'escooter' && '⚡ Low Impact'
+                ].filter(Boolean)}
+                modalId="transport-modal"
+                modalContent={
+                    <Modal id="transport-modal" title="Urban Transportation Impact">
+                        <CalculationContent>
+                            <p>Environmental impact of different urban transportation modes:</p>
+                            <ul className="list-disc pl-4 space-y-2">
+                                <li>Biking/Walking: Zero direct emissions</li>
+                                <li>E-scooter/E-bike: <InlineMath>{"0.015 \\frac{kg}{km}"}</InlineMath> (includes charging)</li>
+                                <li>Bus/Metro: <InlineMath>{"0.090 \\frac{kg}{km}"}</InlineMath> (averaged)</li>
+                                <li>Mixed usage: <InlineMath>{"0.045 \\frac{kg}{km}"}</InlineMath> (estimated average)</li>
+                            </ul>
+                        </CalculationContent>
+                    </Modal>
+                }
+            >
+                <Range
+                    value={publicTransportOptions.findIndex(opt => opt.value === publicTransport)}
+                    onChange={(index) => setPublicTransport(publicTransportOptions[index].value)}
+                    min={0}
+                    max={2}
+                    step={1}
+                    markers={['🚴‍♂️', '🛴', '🚌']}
+                    markerSize="3xl"
+                />
+            </QuestionCard>
+
+            <QuestionCard
+                title="Air Travel"
+                description="How many flights do you take per year?"
+                icon="✈️"
+                image="images/calculator/air-travel.jpg"
+                imageAlt="Airplane in flight"
+                badge={flights ? flightOptions.find(opt => opt.value === flights)?.label : 'Not Selected'}
+                badgeColor={flights ? 'badge-accent' : 'badge-ghost'}
+                status={getCardStatus(flights)}
+                highlight={!flights && !carType && !publicTransport}
+                actions={[
+                    flights === 'never' && '🌱 Zero Emissions',
+                    flights === 'multiple_long' && '⚠️ High Impact'
+                ].filter(Boolean)}
+                modalId="flight-modal"
+                modalContent={
+                    <Modal id="flight-modal" title="Flight Emissions">
+                        <CalculationContent>
+                            <p>CO₂ emissions per flight:</p>
+                            <ul className="list-disc pl-4 space-y-2">
+                                <li>Short-haul flight: <InlineMath>{"0.25"}</InlineMath> tonnes CO₂ per flight</li>
+                                <li>Long-haul flight: <InlineMath>{"1.00"}</InlineMath> tonnes CO₂ per flight</li>
+                            </ul>
+                        </CalculationContent>
+                    </Modal>
+                }
+            >
+                <Dropdown
+                    trigger={flightOptions.find(opt => opt.value === flights)?.label || "Select number of flights"}
+                    items={flightOptions.map(option => ({
+                        label: option.label,
+                        onClick: () => setFlights(option.value)
+                    }))}
+                />
+            </QuestionCard>
+        </CalculatorLayout>
     );
 }
 

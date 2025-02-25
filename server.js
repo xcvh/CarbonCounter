@@ -18,15 +18,15 @@ app.use(express.json()); // Ermöglicht das Parsen von JSON-Body
 
 
 // Tabellen erstellen, falls nicht vorhanden
-db.run(`
+db.exec(`
   CREATE TABLE IF NOT EXISTS "users" (
     "id" INTEGER,
     "code" INTEGER,
     PRIMARY KEY("id" AUTOINCREMENT)
   );
   CREATE TABLE IF NOT EXISTS "quest_cats" (
-	  "id"	INTEGER,
-	  "name"	TEXT,
+    	  "id" INTEGER,
+	  "name"  TEXT,
 	  PRIMARY KEY("id" AUTOINCREMENT)
   );
   CREATE TABLE IF NOT EXISTS "questions" (
@@ -39,11 +39,11 @@ db.run(`
   );
   CREATE TABLE IF NOT EXISTS "quest_results" (
 	  "id"	INTEGER,
-    "user_id" INTEGER,
+    	  "user_id" INTEGER,
 	  "quest_id"	INTEGER,
 	  "emission"	DOUBLE,
 	  PRIMARY KEY("id" AUTOINCREMENT),
-	  FOREIGN KEY("quest_id") REFERENCES "questions"("id")
+	  FOREIGN KEY("quest_id") REFERENCES "questions"("id"),
     FOREIGN KEY("user_id") REFERENCES "users"("id")
   );
   `, (err) => {
@@ -52,7 +52,7 @@ db.run(`
   } else {
       console.log("Tabellen sind bereit");
   }
-});
+}); 
 
 
 function generateUniqueUserCode(callback) {

@@ -1,53 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import Modal from '../components/ui/Modal';
-import 'katex/dist/katex.min.css';
-import { InlineMath, BlockMath } from 'react-katex';
 import Toggle from '../components/ui/Toggle';
 import Dropdown from '../components/ui/Dropdown';
+import RadioGroup from '../components/ui/RadioGroup';
+import 'katex/dist/katex.min.css';
+import { InlineMath, BlockMath } from 'react-katex';
+import CalculatorLayout from '../components/layout/CalculatorLayout';
+import QuestionCard from '../components/calculator/QuestionCard';
+import Modal from '../components/ui/Modal';
 
-function InfoIcon({ modalId, onClick }) {
+function CalculationContent({ children }) {
     return (
-        <button
-            onClick={onClick}
-            className="ml-2 text-gray-500 hover:text-gray-700"
-            title="More information"
-        >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-            </svg>
-        </button>
-    );
-}
-
-function CalculationModal({ id, title, children }) {
-    return (
-        <Modal id={id} title={title}>
-            <div className="space-y-4">
-                {children}
-            </div>
-        </Modal>
-    );
-}
-
-function RadioGroup({ name, options, value, onChange }) {
-    return (
-        <div className="space-y-3">
-            {options.map((option) => (
-                <label key={option.value} className="flex items-center space-x-3 cursor-pointer">
-                    <input
-                        type="radio"
-                        name={name}
-                        value={option.value}
-                        checked={value === option.value}
-                        onChange={(e) => onChange(e.target.value)}
-                        className="radio radio-primary"
-                    />
-                    <span className="text-gray-700">{option.label}</span>
-                </label>
-            ))}
+        <div className="space-y-4">
+            {children}
         </div>
     );
 }
@@ -68,15 +33,14 @@ function createUserCookie() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
-            }, 
+            },
             body: JSON.stringify({})
         })
-        .then(response => response.json())
-        .then(data => document.cookie = "userCode="+data["code"]+"; max-age=3153600000; path=/")
-        .catch(error => console.error("Fehler:", error))
+            .then(response => response.json())
+            .then(data => document.cookie = "userCode=" + data["code"] + "; max-age=3153600000; path=/")
+            .catch(error => console.error("Fehler:", error))
     }
 }
-
 
 function sendToBackend(powerConsumption, ecoElectricity, heatingType, heatingConsumption) {
     fetch("http://localhost:5500/api/living-results", {
@@ -84,13 +48,12 @@ function sendToBackend(powerConsumption, ecoElectricity, heatingType, heatingCon
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userCode: getCookie("userCode"), powerConsumption: powerConsumption, ecoElectricity: ecoElectricity, heatingType: heatingType, heatingConsumption: heatingConsumption}),
+        body: JSON.stringify({ userCode: getCookie("userCode"), powerConsumption: powerConsumption, ecoElectricity: ecoElectricity, heatingType: heatingType, heatingConsumption: heatingConsumption }),
     })
         .then(response => response.json())
         .then(data => console.log("Antwort:", data))
         .catch(error => console.error("Fehler:", error));
 }
-
 
 function LivingPage() {
     const navigate = useNavigate();
@@ -98,17 +61,14 @@ function LivingPage() {
     const [ecoElectricity, setEcoElectricity] = useState('');
     const [heatingType, setHeatingType] = useState('');
     const [heatingConsumption, setHeatingConsumption] = useState('');
+    const [energySource, setEnergySource] = useState('');
+    const [homeSize, setHomeSize] = useState('');
 
     const powerConsumptionOptions = [
         { value: '100', label: 'Under 100 kWh/month' },
         { value: '200', label: '100–300 kWh/month' },
         { value: '400', label: '300–500 kWh/month' },
         { value: '500', label: 'Over 500 kWh/month' },
-    ];
-
-    const ecoElectricityOptions = [
-        { value: 'eco', label: 'Yes, 100%' },
-        { value: 'conventional', label: 'No' },
     ];
 
     const heatingTypeOptions = [
@@ -126,109 +86,187 @@ function LivingPage() {
         { value: '10000', label: 'Over 10,000 kWh/year' },
     ];
 
+    const energySourceOptions = [
+        { value: 'renewable', label: 'Renewable' },
+        { value: 'coal', label: 'Coal' },
+    ];
+
     const handleSubmit = () => {
-        console.log({ powerConsumption, ecoElectricity, heatingType, heatingConsumption });
-        sendToBackend(powerConsumption, ecoElectricity, heatingType, heatingConsumption)
+        console.log({ energySource, heatingType, homeSize });
         navigate('/calculator/mobility');
     };
 
+    // Helper function to determine card status
+    const getCardStatus = (value) => {
+        if (!value) return undefined;
+        return 'completed';
+    };
+
     return (
-        <div className="prose container mx-auto p-4 max-w-3xl">
-            <h2 className="text-2xl font-bold mb-4">Living & Energy</h2>
-            <p className="text-xl text-gray-800 font-medium mb-6">See how your energy consumption is impacting your CO₂ footprint.</p>
-
-            <div className="space-y-6">
-                <Card className="bg-white p-6">
-                    <div className="flex items-center mb-4">
-                        <h3 className="text-lg font-semibold m-0">Electricity</h3>
-                        <InfoIcon onClick={() => document.getElementById('power-modal').showModal()} />
-                    </div>
-                    <div className="mt-2">
-                        <RadioGroup
-                            name="powerConsumption"
-                            options={powerConsumptionOptions}
-                            value={powerConsumption}
-                            onChange={setPowerConsumption}
-                        />
-                    </div>
-                    <CalculationModal id="power-modal" title="Power Consumption Calculation">
-                        <p>The CO₂ balance for power consumption is calculated as follows:</p>
-                        <BlockMath>
-                            {"CO_2 = V_{power} \\times EF_{power}"}
-                        </BlockMath>
-                        <p>Where:</p>
-                        <ul className="list-disc pl-4 space-y-2">
-                            <li><InlineMath>{"V_{power}"}</InlineMath> = Power consumption in kWh</li>
-                            <li><InlineMath>{"EF_{power}"}</InlineMath> = Emission factor in kg CO₂/kWh</li>
-                        </ul>
-                        <p>The emission factor varies by power source:</p>
-                        <ul className="list-disc pl-4 space-y-2">
-                            <li>Green Electricity: <InlineMath>{"EF = 0.032 \\frac{kg}{kWh}"}</InlineMath></li>
-                            <li>Conventional: <InlineMath>{"EF = 0.380 \\frac{kg}{kWh}"}</InlineMath></li>
-                        </ul>
-                    </CalculationModal>
-                    <div className="mt-2">
-                        <Toggle label="I use energy from renewable sources" checked={ecoElectricity === 'eco'} onChange={() => setEcoElectricity(ecoElectricity === 'eco' ? 'conventional' : 'eco')} />
-                    </div>
-
-                </Card>
-
-                <Card className="bg-white p-6">
-                    <div className="flex items-center mb-4">
-                        <h3 className="text-lg font-semibold m-0">Heating</h3>
-                        <InfoIcon onClick={() => document.getElementById('heating-modal').showModal()} />
-                    </div>
-                    <div className="mt-2">
-
-                        <Dropdown
-                            trigger={heatingTypeOptions.find(opt => opt.value === heatingType)?.label || "Select your heating source"}
-                            items={heatingTypeOptions.map(option => ({
-                                label: option.label,
-                                onClick: () => setHeatingType(option.value)
-                            }))}
-                        />
-                    </div>
-                    <div className="mt-4">
-                        <h4 className="text-md font-medium mb-2">Energy Consumption</h4>
-                        <RadioGroup
-                            name="heatingConsumption"
-                            options={heatingConsumptionOptions}
-                            value={heatingConsumption}
-                            onChange={setHeatingConsumption}
-                        />
-                    </div>
-                    <CalculationModal id="heating-modal" title="Heating Calculation">
-                        <p>The CO₂ balance for heating energy is calculated as follows:</p>
-                        <BlockMath>
-                            {"CO_2 = V_{heat} \\times EF_{heat}"}
-                        </BlockMath>
-                        <p>Where:</p>
-                        <ul className="list-disc pl-4">
-                            <li><InlineMath>{"V_{heat}"}</InlineMath> = Heating energy consumption in kWh</li>
-                            <li><InlineMath>{"EF_{heat}"}</InlineMath> = Emission factor of the chosen heating source</li>
-                        </ul>
-                        <p>The emission factors for different heating sources:</p>
-                        <ul className="list-disc pl-4 space-y-2">
-                            <li>Natural Gas: <InlineMath>{"EF = 0.201 \\frac{kg}{kWh}"}</InlineMath></li>
-                            <li>Heating Oil: <InlineMath>{"EF = 0.266 \\frac{kg}{kWh}"}</InlineMath></li>
-                            <li>Heat Pump: <InlineMath>{"EF = \\frac{EF_{power}}{4} \\frac{kg}{kWh}"}</InlineMath></li>
-                            <li>District Heating: <InlineMath>{"EF = 0.148 \\frac{kg}{kWh}"}</InlineMath></li>
-                            <li>Other: <InlineMath>{"EF = 0.02 \\frac{kg}{kWh}"}</InlineMath></li>
-                        </ul>
-                    </CalculationModal>
-                </Card>
-
-                <div className="flex justify-end mt-8">
-                    <Button
-                        variant="primary"
-                        onClick={handleSubmit}
-                        className="w-full md:w-auto px-6 py-2"
-                    >
-                        Continue to Mobility →
-                    </Button>
+        <CalculatorLayout
+            title="Living & Energy"
+            description="See how your living situation and energy usage impact your CO₂ footprint."
+            previousPage="/calculator/consumption"
+            nextPage="/calculator/mobility"
+            onNext={handleSubmit}
+        >
+            <QuestionCard
+                title="Energy Source"
+                description="What's your primary source of electricity?"
+                icon="⚡"
+                image="images/calculator/energy-source.jpg"
+                imageAlt="Various energy sources"
+                badge={energySource ? energySourceOptions.find(opt => opt.value === energySource)?.label : 'Not Selected'}
+                badgeColor={energySource ? 'badge-primary' : 'badge-ghost'}
+                status={getCardStatus(energySource)}
+                highlight={!energySource}
+                actions={[
+                    energySource === 'renewable' && '🌱 Clean Energy',
+                    energySource === 'coal' && '⚠️ High Impact'
+                ].filter(Boolean)}
+                modalId="energy-modal"
+                modalContent={
+                    <Modal id="energy-modal" title="Energy Source Calculation">
+                        <CalculationContent>
+                            <p>The CO₂ balance for power consumption is calculated as follows:</p>
+                            <BlockMath>
+                                {"CO_2 = V_{power} \\times EF_{power}"}
+                            </BlockMath>
+                            <p>Where:</p>
+                            <ul className="list-disc pl-4 space-y-2">
+                                <li><InlineMath>{"V_{power}"}</InlineMath> = Power consumption in kWh</li>
+                                <li><InlineMath>{"EF_{power}"}</InlineMath> = Emission factor in kg CO₂/kWh</li>
+                            </ul>
+                            <p>The emission factor varies by power source:</p>
+                            <ul className="list-disc pl-4 space-y-2">
+                                <li>Green Electricity: <InlineMath>{"EF = 0.032 \\frac{kg}{kWh}"}</InlineMath></li>
+                                <li>Conventional: <InlineMath>{"EF = 0.380 \\frac{kg}{kWh}"}</InlineMath></li>
+                            </ul>
+                        </CalculationContent>
+                    </Modal>
+                }
+            >
+                <div className="mt-2">
+                    <RadioGroup
+                        name="energySource"
+                        options={energySourceOptions}
+                        value={energySource}
+                        onChange={setEnergySource}
+                    />
                 </div>
-            </div>
-        </div>
+            </QuestionCard>
+
+            <QuestionCard
+                title="Heating Type"
+                description="How do you heat your home?"
+                icon="🔥"
+                image="images/calculator/heating-type.jpg"
+                imageAlt="Home heating systems"
+                badge={heatingType ? heatingTypeOptions.find(opt => opt.value === heatingType)?.label : 'Not Selected'}
+                badgeColor={heatingType ? 'badge-secondary' : 'badge-ghost'}
+                status={getCardStatus(heatingType)}
+                highlight={!heatingType && energySource}
+                actions={[
+                    heatingType === 'heatpump' && '🌱 Efficient',
+                    heatingType === 'oil' && '⚠️ High Emissions'
+                ].filter(Boolean)}
+                modalId="heating-modal"
+                modalContent={
+                    <Modal id="heating-modal" title="Heating Calculation">
+                        <CalculationContent>
+                            <p>The CO₂ balance for heating energy is calculated as follows:</p>
+                            <BlockMath>
+                                {"CO_2 = V_{heat} \\times EF_{heat}"}
+                            </BlockMath>
+                            <p>Where:</p>
+                            <ul className="list-disc pl-4">
+                                <li><InlineMath>{"V_{heat}"}</InlineMath> = Heating energy consumption in kWh</li>
+                                <li><InlineMath>{"EF_{heat}"}</InlineMath> = Emission factor of the chosen heating source</li>
+                            </ul>
+                            <p>The emission factors for different heating sources:</p>
+                            <ul className="list-disc pl-4 space-y-2">
+                                <li>Natural Gas: <InlineMath>{"EF = 0.201 \\frac{kg}{kWh}"}</InlineMath></li>
+                                <li>Heating Oil: <InlineMath>{"EF = 0.266 \\frac{kg}{kWh}"}</InlineMath></li>
+                                <li>Heat Pump: <InlineMath>{"EF = \\frac{EF_{power}}{4} \\frac{kg}{kWh}"}</InlineMath></li>
+                                <li>District Heating: <InlineMath>{"EF = 0.148 \\frac{kg}{kWh}"}</InlineMath></li>
+                                <li>Other: <InlineMath>{"EF = 0.02 \\frac{kg}{kWh}"}</InlineMath></li>
+                            </ul>
+                        </CalculationContent>
+                    </Modal>
+                }
+            >
+                <div className="mt-2">
+                    <Dropdown
+                        trigger={heatingTypeOptions.find(opt => opt.value === heatingType)?.label || "Select your heating source"}
+                        items={heatingTypeOptions.map(option => ({
+                            label: option.label,
+                            onClick: () => setHeatingType(option.value)
+                        }))}
+                    />
+                </div>
+                <div className="mt-4">
+                    <h4 className="text-md font-medium mb-2">Energy Consumption</h4>
+                    <RadioGroup
+                        name="heatingConsumption"
+                        options={heatingConsumptionOptions}
+                        value={heatingConsumption}
+                        onChange={setHeatingConsumption}
+                    />
+                </div>
+            </QuestionCard>
+
+            <QuestionCard
+                title="Home Size"
+                description="What's the size of your living space?"
+                icon="🏠"
+                image="images/calculator/home-size.jpg"
+                imageAlt="Different home sizes"
+                badge={homeSize ? `${homeSize}m²` : 'Not Selected'}
+                badgeColor={homeSize ? 'badge-accent' : 'badge-ghost'}
+                status={getCardStatus(homeSize)}
+                highlight={!homeSize && heatingType && energySource}
+                actions={[
+                    homeSize < 50 && '🌱 Efficient Space',
+                    homeSize > 150 && '📊 Large Space'
+                ].filter(Boolean)}
+                modalId="size-modal"
+                modalContent={
+                    <Modal id="size-modal" title="Home Size Calculation">
+                        <CalculationContent>
+                            <p>The CO₂ balance for home size is calculated as follows:</p>
+                            <BlockMath>
+                                {"CO_2 = A \\times EF"}
+                            </BlockMath>
+                            <p>Where:</p>
+                            <ul className="list-disc pl-4">
+                                <li><InlineMath>{"A"}</InlineMath> = Area in m²</li>
+                                <li><InlineMath>{"EF"}</InlineMath> = Emission factor in kg CO₂/m²</li>
+                            </ul>
+                            <p>The emission factor varies by region and building type:</p>
+                            <ul className="list-disc pl-4 space-y-2">
+                                <li>Average: <InlineMath>{"EF = 0.15 \\frac{kg}{m²}"}</InlineMath></li>
+                                <li>Efficient: <InlineMath>{"EF = 0.05 \\frac{kg}{m²}"}</InlineMath></li>
+                                <li>Large: <InlineMath>{"EF = 0.25 \\frac{kg}{m²}"}</InlineMath></li>
+                            </ul>
+                        </CalculationContent>
+                    </Modal>
+                }
+            >
+                <div className="mt-2">
+                    <RadioGroup
+                        name="homeSize"
+                        options={[
+                            { value: '50', label: 'Under 50m²' },
+                            { value: '100', label: '50–100m²' },
+                            { value: '150', label: '100–150m²' },
+                            { value: '200', label: 'Over 150m²' },
+                        ]}
+                        value={homeSize}
+                        onChange={setHomeSize}
+                    />
+                </div>
+            </QuestionCard>
+        </CalculatorLayout>
     );
 }
 
