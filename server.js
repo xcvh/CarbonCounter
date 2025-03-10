@@ -500,17 +500,17 @@ app.get('/api/results/:userCode', (req, res) => {
         item.badges = ["Good"];
         item.badgeColor = "badge-success";
         item.percentage = 100;
-        item.description = "Du hast einen sehr niedrigen CO₂-Fußabdruck in diesem Bereich!";
+        item.description = "You have a very low CO₂ footprint in this category!";
       } else if (item.tons < 5) {
         item.badges = ["So so"];
         item.badgeColor = "badge-warning";
         item.percentage = 60;
-        item.description = "Dein CO₂-Fußabdruck ist durchschnittlich, aber es gibt Verbesserungspotential.";
+        item.description = "Your CO₂ footprint is average, but there is room for improvement.";
       } else {
         item.badges = ["Bad"];
         item.badgeColor = "badge-error";
         item.percentage = 10;
-        item.description = "Dein CO₂-Fußabdruck ist hoch. Versuche, umweltfreundlichere Entscheidungen zu treffen.";
+        item.description = "Your CO₂ footprint is high. Try making more environmentally friendly choices.";
       }
     });
 
