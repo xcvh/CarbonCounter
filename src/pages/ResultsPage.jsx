@@ -1,92 +1,42 @@
 import Card from "../components/ui/Card";
 import Progress from "../components/ui/Progress";
 import Stat from "../components/ui/Stat";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+
+function getCookie(name) {
+  let cookies = document.cookie.split("; ");
+  for (let cookie of cookies) {
+      let [key, value] = cookie.split("=");
+      if (key === name) return value;
+  }
+  return null;
+}
 
 function ResultsPage() {
   const [data, setData] = useState([]);
+  const userCode = getCookie("userCode");
+
+  useEffect(() => {
+    if (!userCode) return;
+    
+    fetch(`http://localhost:5500/api/results/${userCode}`)
+      .then((response) => response.json())
+      .then((apiData) => setData(apiData))
+      .catch((error) => console.error("Error fetching results:", error));
+  }, [userCode]);
 
   return (
     <div className="prose container mx-auto w-full max-w-5xl">
       <h2>Your Results</h2>
       <div className="grid grid-cols-2 gap-2">
-
-        <Card
-          image="living.jpg"
-          imageAlt="A shot of the earth from space"
-          title="Living"
-          badges={["Good"]}
-          badgeColor="badge-success"
-        >
-
-          <Stat tons={3} percentage={-20} />
-
-          <p>
-            Your energy use is efficient and eco-friendly! Whether it’s using
-            renewables or minimizing waste, you’re keeping your footprint low.
-          </p>
-
-          <Progress value={20} />
-
-        </Card>
-
-        <Card
-          image="mobility.jpg"
-          imageAlt="A shot of a busy highway intersection"
-          title="Mobility"
-          badges={["So so"]}
-          badgeColor="badge-warning"
-        >
-
-          <Stat tons={4} percentage={12} />
-
-          <p>
-            Your travel choices balance sustainability and convenience. Cutting
-            back on flights or car trips could further reduce your emissions.
-          </p>
-
-          <Progress value={46} />
-
-        </Card>
-
-        <Card
-          image="food.jpg"
-          imageAlt="A bowl of food"
-          title="Food"
-          badges={["Bad"]}
-          badgeColor="badge-error"
-        >
-
-          <Stat tons={5} percentage={52} />
-
-          <p>
-            Your diet has a high carbon impact, likely due to meat consumption
-            or food waste. Eating more plant-based meals can help lower it.
-          </p>
-
-          <Progress value={77} />
-
-        </Card>
-
-        <Card
-          image="consumption.jpg"
-          imageAlt="A photo of a mural saying 'Use less'"
-          title="Consumption"
-          badges={["Good"]}
-          badgeColor="badge-success"
-        >
-
-          <Stat tons={1} percentage={-43} />
-
-          <p>
-            You make mindful choices, avoiding waste and unnecessary purchases.
-            Your habits help reduce environmental impact—keep it up!
-          </p>
-
-          <Progress value={17} />
-
-        </Card>
-
+        {data.map((item, index) => (
+          <Card key={index} image={`${item.category.toLowerCase()}.jpg`} imageAlt={item.category} title={item.category} badges={item.badges} badgeColor={item.badgeColor}>
+            <Stat tons={item.tons} percentage={item.percentage} />
+            <p>{item.description}</p>
+            <Progress value={Math.min(Math.max(item.percentage, 0), 100)} />
+          </Card>
+        ))}
       </div>
     </div>
   );

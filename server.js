@@ -433,6 +433,94 @@ app.post('/api/consumption-results', (req, res) => {
   })
 })
 
+
+app.get('/api/results/:userCode', (req, res) => {
+  const { userCode } = req.params;
+
+  if (!userCode) {
+    return res.status(400).json({ error: "UserCode fehlt!" });
+  }
+
+  const categories = {
+    1: "Living",
+    2: "Living",
+    3: "Mobility",
+    4: "Mobility",
+    5: "Mobility",
+    6: "Food",
+    7: "Food",
+    8: "Food",
+    9: "Consumption",
+    10: "Consumption",
+    11: "Consumption",
+    12: "Consumption",
+  };
+
+  // Abfrage aller Emissionen für den Nutzer
+  const sql = `
+    SELECT qr.quest_id, q.name, SUM(qr.emission) AS total_emission
+    FROM quest_results qr
+    JOIN questions q ON qr.quest_id = q.id
+    WHERE qr.user_id = ?
+    GROUP BY qr.quest_id;
+  `;
+
+  db.all(sql, [userCode], (err, rows) => {
+    if (err) {
+      console.error("Fehler bei der Abfrage der Ergebnisse:", err.message);
+      return res.status(500).json({ error: "Fehler beim Abrufen der Daten" });
+    }
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Keine Ergebnisse gefunden" });
+    }
+
+    const results = {};
+
+    rows.forEach(({ quest_id, name, total_emission }) => {
+      const category = categories[quest_id] || "Other";
+      
+      if (!results[category]) {
+        results[category] = {
+          category,
+          badges: [],
+          badgeColor: "",
+          tons: 0,
+          percentage: 0,
+          description: "",
+        };
+      }
+
+      results[category].tons += parseFloat((total_emission/1000).toFixed(2));
+    });
+
+    // Bewertung und Badge-Farben setzen
+    Object.values(results).forEach((item) => {
+      if (item.tons < 2) {
+        item.badges = ["Good"];
+        item.badgeColor = "badge-success";
+        item.percentage = 100;
+        item.description = "Du hast einen sehr niedrigen CO₂-Fußabdruck in diesem Bereich!";
+      } else if (item.tons < 5) {
+        item.badges = ["So so"];
+        item.badgeColor = "badge-warning";
+        item.percentage = 60;
+        item.description = "Dein CO₂-Fußabdruck ist durchschnittlich, aber es gibt Verbesserungspotential.";
+      } else {
+        item.badges = ["Bad"];
+        item.badgeColor = "badge-error";
+        item.percentage = 10;
+        item.description = "Dein CO₂-Fußabdruck ist hoch. Versuche, umweltfreundlichere Entscheidungen zu treffen.";
+      }
+    });
+
+    res.json(Object.values(results));
+  });
+});
+
+
+
+
 // Server starten
 app.listen(PORT, () => {
   console.log(`Backend läuft auf http://localhost:${PORT}`);
