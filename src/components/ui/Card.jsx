@@ -24,7 +24,7 @@ const Card = ({
       )}
       <div className="card-body">
         {(title || badges.length > 0) && (
-          <h2 className="card-title">
+          <h2 className="card-title mt-2">
             {title}
             {badges.map((badge, index) => (
               <div key={index} className={`badge ${badgeColor}`}>
