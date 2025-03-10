@@ -32,6 +32,46 @@ function CalculationModal({ id, title, children }) {
     );
 }
 
+function getCookie(name) {
+    let cookies = document.cookie.split("; ");
+    for (let cookie of cookies) {
+        let [key, value] = cookie.split("=");
+        if (key === name) return value;
+    }
+    return null;
+}
+
+createUserCookie();
+function createUserCookie() {
+    if (!getCookie("userCode")) {
+        fetch("http://localhost:5500/api/user", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }, 
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => document.cookie = "userCode="+data["code"]+"; max-age=3153600000; path=/")
+        .catch(error => console.error("Fehler:", error))
+    }
+}
+
+
+function sendToBackend(carDistance, carType, publicTransport, flightOptions) {
+    console.log({userCode: getCookie("userCode"), carType: carType, carDistance: carDistance, publicTransport: publicTransport, flightOptions: flightOptions})
+    fetch("http://localhost:5500/api/mobility-results", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userCode: getCookie("userCode"), carType: carType, carDistance: carDistance, publicTransport: publicTransport, flightOptions: flightOptions}),
+    })
+        .then(response => response.json())
+        .then(data => console.log("Antwort:", data))
+        .catch(error => console.error("Fehler:", error));
+}
+
 function MobilityPage() {
     const navigate = useNavigate();
     const [carKilometers, setCarKilometers] = useState('');
@@ -50,27 +90,27 @@ function MobilityPage() {
         { value: 'petrol', label: 'Petrol' },
         { value: 'diesel', label: 'Diesel/LPG' },
         { value: 'hybrid', label: 'Hybrid' },
-        { value: 'natural_gas', label: 'Natural Gas' },
+        { value: 'naturalGas', label: 'Natural Gas' },
         { value: 'electric', label: 'Electric' },
     ];
 
     const publicTransportOptions = [
-        { value: 'bike_walk', label: 'Mostly bike or walk', emissionFactor: 0 },
-        { value: 'escooter', label: 'Mostly e-scooter or e-bike', emissionFactor: 0.015 },
-        { value: 'public_transport', label: 'Mostly bus or metro', emissionFactor: 0.090 }
+        { value: 'bikeWalk', label: 'Mostly bike or walk', emissionFactor: 0 },
+        { value: 'eScooter', label: 'Mostly e-scooter or e-bike', emissionFactor: 0.015 },
+        { value: 'publicTransport', label: 'Mostly bus or metro', emissionFactor: 0.090 }
     ];
 
     const flightOptions = [
-        { value: 'never', label: 'Never' },
-        { value: '1_short', label: '1 short-haul flight' },
-        { value: '2-3_short', label: '2-3 short-haul flights' },
-        { value: '1_long', label: '1 long-haul flight' },
-        { value: 'multiple_long', label: 'More than 2 long-haul flights' },
+        { value: '0', label: 'Never' },
+        { value: '1 s', label: '1 short-haul flight' },
+        { value: '2.5 s', label: '2-3 short-haul flights' },
+        { value: '1 l', label: '1 long-haul flight' },
+        { value: '3 l', label: 'More than 2 long-haul flights' },
     ];
 
     const handleSubmit = () => {
-        // TODO: Calculate carbon footprint based on inputs
         console.log({ carKilometers, carType, publicTransport, flights });
+        sendToBackend(carKilometers, carType, publicTransport, flights);
         navigate('/calculator/food');
     };
 

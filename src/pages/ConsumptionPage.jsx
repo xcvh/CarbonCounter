@@ -31,6 +31,45 @@ function CalculationModal({ id, title, children }) {
     );
 }
 
+function getCookie(name) {
+    let cookies = document.cookie.split("; ");
+    for (let cookie of cookies) {
+        let [key, value] = cookie.split("=");
+        if (key === name) return value;
+    }
+    return null;
+}
+
+createUserCookie();
+function createUserCookie() {
+    if (!getCookie("userCode")) {
+        fetch("http://localhost:5500/api/user", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }, 
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => document.cookie = "userCode="+data["code"]+"; max-age=3153600000; path=/")
+        .catch(error => console.error("Fehler:", error))
+    }
+}
+
+function sendToBackend(clothingAmount, usedClothing, onlineOrders, foodWaste) {
+    fetch("http://localhost:5500/api/consumption-results", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userCode: getCookie("userCode"), clothingAmount: clothingAmount, usedClothing: usedClothing, onlineOrders: onlineOrders, foodWaste: foodWaste}),
+    })
+        .then(response => response.json())
+        .then(data => console.log("Antwort:", data))
+        .catch(error => console.error("Fehler:", error));
+}
+
+
 function ConsumptionPage() {
     const navigate = useNavigate();
     const [clothingAmount, setClothingAmount] = useState('');
@@ -39,36 +78,36 @@ function ConsumptionPage() {
     const [foodWaste, setFoodWaste] = useState('');
 
     const clothingAmountOptions = [
-        { value: '1-2', label: '1-2 items' },
-        { value: '3-6', label: '3-6 items' },
-        { value: '7-10', label: '7-10 items' },
-        { value: 'over10', label: 'More than 10 items' },
+        { value: '1.5', label: '1-2 items' },
+        { value: '4.5', label: '3-6 items' },
+        { value: '8.5', label: '7-10 items' },
+        { value: '10', label: 'More than 10 items' },
     ];
 
     const usedClothingOptions = [
-        { value: 'always', label: 'Always' },
-        { value: 'often', label: 'Often' },
-        { value: 'rarely', label: 'Rarely' },
-        { value: 'never', label: 'Never' },
+        { value: '1', label: 'Always' },
+        { value: '0.5', label: 'Often' },
+        { value: '0.1', label: 'Rarely' },
+        { value: '0', label: 'Never' },
     ];
 
     const onlineOrderOptions = [
-        { value: 'never', label: 'Never' },
-        { value: '1-2', label: '1-2 times/month' },
-        { value: '3-5', label: '3-5 times/month' },
-        { value: 'over5', label: 'More than 5 times/month' },
+        { value: '0', label: 'Never' },
+        { value: '1.5', label: '1-2 times/month' },
+        { value: '4', label: '3-5 times/month' },
+        { value: '5', label: 'More than 5 times/month' },
     ];
 
     const foodWasteOptions = [
-        { value: 'none', label: 'None' },
-        { value: 'under1', label: 'Less than 1 kg/month' },
-        { value: '1-3', label: '1-3 kg/month' },
-        { value: 'over3', label: 'More than 3 kg/month' },
+        { value: '0', label: 'None' },
+        { value: '1', label: 'Less than 1 kg/month' },
+        { value: '2', label: '1-3 kg/month' },
+        { value: '3', label: 'More than 3 kg/month' },
     ];
 
     const handleSubmit = () => {
-        // TODO: Calculate carbon footprint based on inputs
         console.log({ clothingAmount, usedClothing, onlineOrders, foodWaste });
+        sendToBackend(clothingAmount, usedClothing, onlineOrders, foodWaste);
         navigate('/results');
     };
 
