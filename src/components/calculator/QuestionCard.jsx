@@ -36,14 +36,14 @@ export default function QuestionCard({
             title={
                 <div className="flex items-center gap-2">
                     {icon && (
-                        <span className="text-2xl transform transition-transform duration-300 group-hover:scale-110">
+                        <span className="text-2xl">
                             {icon}
                         </span>
                     )}
                     <span className="flex-grow">{title}</span>
                     <InfoIcon
                         onClick={() => document.getElementById(modalId).showModal()}
-                        className="opacity-70 hover:opacity-100 transition-opacity"
+                        className="opacity-70"
                     />
                 </div>
             }
@@ -62,9 +62,6 @@ export default function QuestionCard({
                 ${highlightEffect}
                 transition-all
                 duration-300
-                hover:shadow-2xl
-                hover:scale-[1.02]
-                hover:-translate-y-1
                 ${className}
             `}
             actions={actions}
