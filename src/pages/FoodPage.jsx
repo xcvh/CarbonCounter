@@ -32,12 +32,12 @@ function createUserCookie() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
-            }, 
+            },
             body: JSON.stringify({})
         })
-        .then(response => response.json())
-        .then(data => document.cookie = "userCode="+data["code"]+"; max-age=3153600000; path=/")
-        .catch(error => console.error("Fehler:", error))
+            .then(response => response.json())
+            .then(data => document.cookie = "userCode=" + data["code"] + "; max-age=3153600000; path=/")
+            .catch(error => console.error("Fehler:", error))
     }
 }
 
@@ -47,7 +47,7 @@ function sendToBackend(dietType, localFood, processedFood) {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userCode: getCookie("userCode"), dietType: dietType, localFood: localFood, processedFood: processedFood}),
+        body: JSON.stringify({ userCode: getCookie("userCode"), dietType: dietType, localFood: localFood, processedFood: processedFood }),
     })
         .then(response => response.json())
         .then(data => console.log("Antwort:", data))
@@ -215,7 +215,7 @@ function FoodPage() {
                     min={0}
                     max={2}
                     step={1}
-                    markers={['🌽', '🥫', '🍔']}
+                    markers={['🍔', '🥫', '🌽']}
                     markerSize="3xl"
                     className="w-full"
                 />
