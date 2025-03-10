@@ -32,24 +32,24 @@ function createUserCookie() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
-            }, 
+            },
             body: JSON.stringify({})
         })
-        .then(response => response.json())
-        .then(data => document.cookie = "userCode="+data["code"]+"; max-age=3153600000; path=/")
-        .catch(error => console.error("Fehler:", error))
+            .then(response => response.json())
+            .then(data => document.cookie = "userCode=" + data["code"] + "; max-age=3153600000; path=/")
+            .catch(error => console.error("Fehler:", error))
     }
 }
 
 
 function sendToBackend(carDistance, carType, publicTransport, flightOptions) {
-    console.log({userCode: getCookie("userCode"), carType: carType, carDistance: carDistance, publicTransport: publicTransport, flightOptions: flightOptions})
+    console.log({ userCode: getCookie("userCode"), carType: carType, carDistance: carDistance, publicTransport: publicTransport, flightOptions: flightOptions })
     fetch("http://localhost:5500/api/mobility-results", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userCode: getCookie("userCode"), carType: carType, carDistance: carDistance, publicTransport: publicTransport, flightOptions: flightOptions}),
+        body: JSON.stringify({ userCode: getCookie("userCode"), carType: carType, carDistance: carDistance, publicTransport: publicTransport, flightOptions: flightOptions }),
     })
         .then(response => response.json())
         .then(data => console.log("Antwort:", data))
@@ -158,11 +158,12 @@ function MobilityPage() {
                     <Range
                         value={carKilometers}
                         onChange={setCarKilometers}
-                        min={5000}
-                        max={20000}
-                        step={5000}
-                        markers={['<5000', '<10000', '<15000', '>15000']}
+                        min={0}
+                        max={4}
+                        step={1}
+                        markers={['0', '<5000', '<10000', '<15000', '>15000']}
                         markerSize="lg"
+                        valueMap={[0, 5000, 10000, 15000, 20000]}
                     />
                 </div>
             </QuestionCard>
