@@ -16,6 +16,44 @@ function CalculationContent({ children }) {
     );
 }
 
+function getCookie(name) {
+    let cookies = document.cookie.split("; ");
+    for (let cookie of cookies) {
+        let [key, value] = cookie.split("=");
+        if (key === name) return value;
+    }
+    return null;
+}
+
+createUserCookie();
+function createUserCookie() {
+    if (!getCookie("userCode")) {
+        fetch("http://localhost:5500/api/user", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }, 
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => document.cookie = "userCode="+data["code"]+"; max-age=3153600000; path=/")
+        .catch(error => console.error("Fehler:", error))
+    }
+}
+
+function sendToBackend(dietType, localFood, processedFood) {
+    fetch("http://localhost:5500/api/food-results", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userCode: getCookie("userCode"), dietType: dietType, localFood: localFood, processedFood: processedFood}),
+    })
+        .then(response => response.json())
+        .then(data => console.log("Antwort:", data))
+        .catch(error => console.error("Fehler:", error));
+}
+
 function FoodPage() {
     const navigate = useNavigate();
     const [dietType, setDietType] = useState('');
@@ -25,8 +63,8 @@ function FoodPage() {
     const dietTypeOptions = [
         { value: 'vegan', label: 'Vegan' },
         { value: 'vegetarian', label: 'Vegetarian' },
-        { value: 'mixed_low', label: 'Mixed Diet (low meat)' },
-        { value: 'mixed_high', label: 'Mixed Diet (high meat)' },
+        { value: 'mixedLow', label: 'Mixed Diet (low meat)' },
+        { value: 'mixedHigh', label: 'Mixed Diet (high meat)' },
     ];
 
     const localFoodOptions = [
@@ -44,6 +82,7 @@ function FoodPage() {
 
     const handleSubmit = () => {
         console.log({ dietType, localFood, processedFood });
+        sendToBackend(dietType, localFood, processedFood);
         navigate('/calculator/consumption');
     };
 
