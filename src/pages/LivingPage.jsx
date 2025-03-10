@@ -62,7 +62,6 @@ function LivingPage() {
     const [heatingType, setHeatingType] = useState('');
     const [heatingConsumption, setHeatingConsumption] = useState('');
     const [energySource, setEnergySource] = useState('');
-    const [homeSize, setHomeSize] = useState('');
 
     const powerConsumptionOptions = [
         { value: '100', label: 'Under 100 kWh/month' },
@@ -92,7 +91,7 @@ function LivingPage() {
     ];
 
     const handleSubmit = () => {
-        console.log({ energySource, heatingType, homeSize });
+        console.log({ energySource, heatingType });
         navigate('/calculator/mobility');
     };
 
@@ -211,58 +210,6 @@ function LivingPage() {
                         options={heatingConsumptionOptions}
                         value={heatingConsumption}
                         onChange={setHeatingConsumption}
-                    />
-                </div>
-            </QuestionCard>
-
-            <QuestionCard
-                title="Home Size"
-                description="What's the size of your living space?"
-                icon="🏠"
-                image="images/calculator/home-size.jpg"
-                imageAlt="Different home sizes"
-                badge={homeSize ? `${homeSize}m²` : 'Not Selected'}
-                badgeColor={homeSize ? 'badge-accent' : 'badge-ghost'}
-                status={getCardStatus(homeSize)}
-                highlight={!homeSize && heatingType && energySource}
-                actions={[
-                    homeSize < 50 && '🌱 Efficient Space',
-                    homeSize > 150 && '📊 Large Space'
-                ].filter(Boolean)}
-                modalId="size-modal"
-                modalContent={
-                    <Modal id="size-modal" title="Home Size Calculation">
-                        <CalculationContent>
-                            <p>The CO₂ balance for home size is calculated as follows:</p>
-                            <BlockMath>
-                                {"CO_2 = A \\times EF"}
-                            </BlockMath>
-                            <p>Where:</p>
-                            <ul className="list-disc pl-4">
-                                <li><InlineMath>{"A"}</InlineMath> = Area in m²</li>
-                                <li><InlineMath>{"EF"}</InlineMath> = Emission factor in kg CO₂/m²</li>
-                            </ul>
-                            <p>The emission factor varies by region and building type:</p>
-                            <ul className="list-disc pl-4 space-y-2">
-                                <li>Average: <InlineMath>{"EF = 0.15 \\frac{kg}{m²}"}</InlineMath></li>
-                                <li>Efficient: <InlineMath>{"EF = 0.05 \\frac{kg}{m²}"}</InlineMath></li>
-                                <li>Large: <InlineMath>{"EF = 0.25 \\frac{kg}{m²}"}</InlineMath></li>
-                            </ul>
-                        </CalculationContent>
-                    </Modal>
-                }
-            >
-                <div className="mt-2">
-                    <RadioGroup
-                        name="homeSize"
-                        options={[
-                            { value: '50', label: 'Under 50m²' },
-                            { value: '100', label: '50–100m²' },
-                            { value: '150', label: '100–150m²' },
-                            { value: '200', label: 'Over 150m²' },
-                        ]}
-                        value={homeSize}
-                        onChange={setHomeSize}
                     />
                 </div>
             </QuestionCard>
