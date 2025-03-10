@@ -42,13 +42,19 @@ function createUserCookie() {
     }
 }
 
-function sendToBackend(powerConsumption, ecoElectricity, heatingType, heatingConsumption) {
+function sendToBackend(powerConsumption, energySource, heatingType, heatingConsumption) {
     fetch("http://localhost:5500/api/living-results", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userCode: getCookie("userCode"), powerConsumption: powerConsumption, ecoElectricity: ecoElectricity, heatingType: heatingType, heatingConsumption: heatingConsumption }),
+        body: JSON.stringify({
+            userCode: getCookie("userCode"),
+            powerConsumption: powerConsumption,
+            ecoElectricity: energySource === 'renewable',
+            heatingType: heatingType,
+            heatingConsumption: heatingConsumption
+        }),
     })
         .then(response => response.json())
         .then(data => console.log("Antwort:", data))
@@ -58,7 +64,6 @@ function sendToBackend(powerConsumption, ecoElectricity, heatingType, heatingCon
 function LivingPage() {
     const navigate = useNavigate();
     const [powerConsumption, setPowerConsumption] = useState('');
-    const [ecoElectricity, setEcoElectricity] = useState('');
     const [heatingType, setHeatingType] = useState('');
     const [heatingConsumption, setHeatingConsumption] = useState('');
     const [energySource, setEnergySource] = useState('');
@@ -151,6 +156,15 @@ function LivingPage() {
                         options={energySourceOptions}
                         value={energySource}
                         onChange={setEnergySource}
+                    />
+                </div>
+                <div className="mt-4">
+                    <h4 className="text-md font-medium mb-2">Power Consumption</h4>
+                    <RadioGroup
+                        name="powerConsumption"
+                        options={powerConsumptionOptions}
+                        value={powerConsumption}
+                        onChange={setPowerConsumption}
                     />
                 </div>
             </QuestionCard>
