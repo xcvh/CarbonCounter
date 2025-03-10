@@ -68,10 +68,10 @@ function FoodPage() {
     ];
 
     const localFoodOptions = [
-        { value: 'over75', label: 'Mainly local and seasonal food' },
-        { value: '50-75', label: 'Quite a lot of local and seasonal food' },
-        { value: '25-50', label: 'Some local and seasonal food' },
-        { value: 'under25', label: 'Little local and seasonal food' },
+        { value: 'over75', label: 'Mostly local & seasonal' },
+        { value: '50-75', label: 'Often local & seasonal' },
+        { value: '25-50', label: 'Sometimes local & seasonal' },
+        { value: 'under25', label: 'Rarely local & seasonal' },
     ];
 
     const processedFoodOptions = [

@@ -27,13 +27,13 @@ const Card = ({
           <h2 className="card-title mt-2">
             {title}
             {badges.map((badge, index) => (
-              <div key={index} className={`badge ${badgeColor}`}>
+              <div key={index} className={`badge ${badgeColor} whitespace-nowrap min-w-[4rem]`}>
                 {badge}
               </div>
             ))}
           </h2>
         )}
-	<h4 className="text-lg font-bold">{subtitle}</h4>
+        <h4 className="text-lg font-bold">{subtitle}</h4>
         {children}
         {actions.length > 0 && (
           <div className="card-actions justify-end">
