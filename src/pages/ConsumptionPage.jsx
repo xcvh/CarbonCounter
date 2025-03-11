@@ -31,12 +31,12 @@ function createUserCookie() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
-            }, 
+            },
             body: JSON.stringify({})
         })
-        .then(response => response.json())
-        .then(data => document.cookie = "userCode="+data["code"]+"; max-age=3153600000; path=/")
-        .catch(error => console.error("Fehler:", error))
+            .then(response => response.json())
+            .then(data => document.cookie = "userCode=" + data["code"] + "; max-age=3153600000; path=/")
+            .catch(error => console.error("Fehler:", error))
     }
 }
 
@@ -46,7 +46,7 @@ function sendToBackend(clothingAmount, usedClothing, onlineOrders, foodWaste) {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userCode: getCookie("userCode"), clothingAmount: clothingAmount, usedClothing: usedClothing, onlineOrders: onlineOrders, foodWaste: foodWaste}),
+        body: JSON.stringify({ userCode: getCookie("userCode"), clothingAmount: clothingAmount, usedClothing: usedClothing, onlineOrders: onlineOrders, foodWaste: foodWaste }),
     })
         .then(response => response.json())
         .then(data => console.log("Antwort:", data))
@@ -106,7 +106,7 @@ function ConsumptionPage() {
             title="Consumption & Waste"
             description="See how your consumption and waste habits impact your CO₂ footprint."
             previousPage="/calculator/food"
-            nextPage="/calculator/living"
+            nextPage="/results"
             onNext={handleSubmit}
         >
             <QuestionCard

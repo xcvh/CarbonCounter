@@ -7,8 +7,8 @@ import { useState, useEffect } from "react";
 function getCookie(name) {
   let cookies = document.cookie.split("; ");
   for (let cookie of cookies) {
-      let [key, value] = cookie.split("=");
-      if (key === name) return value;
+    let [key, value] = cookie.split("=");
+    if (key === name) return value;
   }
   return null;
 }
@@ -19,7 +19,7 @@ function ResultsPage() {
 
   useEffect(() => {
     if (!userCode) return;
-    
+
     fetch(`http://localhost:5500/api/results/${userCode}`)
       .then((response) => response.json())
       .then((apiData) => setData(apiData))
@@ -32,10 +32,10 @@ function ResultsPage() {
       <div className="grid grid-cols-2 gap-2">
         {data.map((item, index) => (
           <Card key={index}
-          image={`${item.category.toLowerCase()}.jpg`}
-          imageAlt={item.category} title={item.category}
-          badges={item.badges}
-          badgeColor={item.badgeColor}>
+            image={`${item.category.toLowerCase()}.jpg`}
+            imageAlt={item.category} title={item.category}
+            badges={item.badges}
+            badgeColor={item.badgeColor}>
             <Stat tons={item.tons} percentage={item.percentage} />
             <p>{item.description}</p>
             <Progress value={Math.min(Math.max(item.percentage, 0), 100)} />

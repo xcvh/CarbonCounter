@@ -508,7 +508,7 @@ app.get('/api/results/:userCode', (req, res) => {
         item.description = "You have a very low CO₂ footprint in this category!";
       } else if (item.tons < 5) {
         item.badges = ["So so"];
-        item.badgeColor = "badge-success";
+        item.badgeColor = "badge-neutral";
         item.percentage = 60;
         item.description = "Your CO₂ footprint is average, but there is room for improvement.";
       } else {
