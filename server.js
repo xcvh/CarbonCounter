@@ -48,11 +48,11 @@ db.exec(`
   );
   `, (err) => {
   if (err) {
-      console.error("Fehler beim Erstellen der Tabellen:", err.message);
+    console.error("Fehler beim Erstellen der Tabellen:", err.message);
   } else {
-      console.log("Tabellen sind bereit");
+    console.log("Tabellen sind bereit");
   }
-}); 
+});
 
 
 function generateUniqueUserCode(callback) {
@@ -60,15 +60,15 @@ function generateUniqueUserCode(callback) {
 
   // Prüfen, ob der Code bereits existiert
   db.get("SELECT code FROM users WHERE code = ?", [randomCode], (err, row) => {
-      if (err) {
-          console.error("Fehler bei der Code-Prüfung:", err.message);
-          callback(null);
-      } else if (row) {
-          console.log("Code existiert bereits, neuer Versuch...");
-          generateUniqueCode(callback); // Falls der Code schon existiert, neuen generieren
-      } else {
-        callback(randomCode); // Falls der Code einzigartig ist, zurückgeben
-      }
+    if (err) {
+      console.error("Fehler bei der Code-Prüfung:", err.message);
+      callback(null);
+    } else if (row) {
+      console.log("Code existiert bereits, neuer Versuch...");
+      generateUniqueCode(callback); // Falls der Code schon existiert, neuen generieren
+    } else {
+      callback(randomCode); // Falls der Code einzigartig ist, zurückgeben
+    }
   });
 }
 
@@ -78,17 +78,17 @@ app.post('/api/user', (req, res) => {
 
   generateUniqueUserCode((uniqueCode) => {
     if (!uniqueCode) {
-        return res.status(500).json({ error: "Fehler bei der Code-Generierung" });
+      return res.status(500).json({ error: "Fehler bei der Code-Generierung" });
     }
     const sql = 'INSERT INTO users (code) VALUES (?)'
     const values = [uniqueCode]
     db.run(sql, values, function (err) {
-      if(err) {
+      if (err) {
         console.error("Fehler beim Einfügen: ", err.message);
-        return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
+        return res.status(500).json({ error: "Fehler beim Einfügen der Daten" })
       }
-      console.log("Nutzer gespeichert: ", {uniqueCode})
-      res.json({message: "User erfolgreich gespeichert", code: uniqueCode})
+      console.log("Nutzer gespeichert: ", { uniqueCode })
+      res.json({ message: "User erfolgreich gespeichert", code: uniqueCode })
     })
   })
 })
@@ -98,9 +98,9 @@ app.post('/api/user', (req, res) => {
 app.post('/api/living-results', (req, res) => {
   const { userCode, powerConsumption, energySource, heatingType, heatingConsumption } = req.body; // Daten aus dem Body abrufen
 
-  if ( !userCode && !powerConsumption && !energySource && !heatingType && !heatingConsumption) {
+  if (!userCode && !powerConsumption && !energySource && !heatingType && !heatingConsumption) {
     return res.status(400).json({ error: "Eingabe fehlt!" });
-  }else if (!userCode || !powerConsumption || !energySource || !heatingType || !heatingConsumption) {
+  } else if (!userCode || !powerConsumption || !energySource || !heatingType || !heatingConsumption) {
     return res.status(400).json({ error: "Eingabe nicht volständig" });
   }
 
@@ -108,21 +108,21 @@ app.post('/api/living-results', (req, res) => {
   let sql = 'DELETE FROM quest_results WHERE user_id=? AND (quest_id=1 OR quest_id=2)';
   let values = [userCode];
   db.run(sql, values, (err) => {
-    if(err){
+    if (err) {
       console.error("Fehler beim Löschen der Daten")
-      return res.status(500).json({error: "Fehler beim Löschen der Daten"})
+      return res.status(500).json({ error: "Fehler beim Löschen der Daten" })
     } else {
       console.log("Daten erfolgreich gelöscht")
 
       let sql = 'SELECT EF FROM questions WHERE id=? OR id=? ORDER BY id ASC'
       let values = [1, 2]
       db.all(sql, values, (err, rows) => {
-        if(err) {
+        if (err) {
           console.error("Fehler bei der Abfrage")
-          return res.status(500).json({error: "Fehler beim Abfragen des EF"})
+          return res.status(500).json({ error: "Fehler beim Abfragen des EF" })
         } else if (rows) {
-          console.log("EF abgefragt:", {rows});
-          
+          console.log("EF abgefragt:", { rows });
+
 
           // Calculate electric emission
           const electricEF = JSON.parse(rows[0]['EF'])[energySource]
@@ -131,9 +131,9 @@ app.post('/api/living-results', (req, res) => {
           let sql = 'INSERT INTO quest_results (user_id, quest_id, emission) VALUES (?, ?, ?)'
           let values = [userCode, 1, electricEmission]
           db.run(sql, values, (err) => {
-            if(err){
+            if (err) {
               console.error("Fehler beim Einfügen der Daten")
-              return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
+              return res.status(500).json({ error: "Fehler beim Einfügen der Daten" })
             } else {
               console.log("Daten erfolgreich eingefügt")
               //res.json({ message: `Ergebnisse für: ${userCode}, ${powerConsumption}, ${ecoElectricity}, ${heatingType}, ${heatingConsumption}` });
@@ -144,7 +144,7 @@ app.post('/api/living-results', (req, res) => {
           const heatingEF = JSON.parse(rows[1]['EF'])[heatingType]
           console.log(heatingEF);
           let heatingEmission;
-          if(heatingType != "heatingPump") {
+          if (heatingType != "heatingPump") {
             heatingEmission = heatingConsumption * heatingEF
           } else {
             heatingEmission = heatingConsumption * heatingEF * electricEF
@@ -152,9 +152,9 @@ app.post('/api/living-results', (req, res) => {
           sql = 'INSERT INTO quest_results (user_id, quest_id, emission) VALUES (?, ?, ?)'
           values = [userCode, 2, heatingEmission]
           db.run(sql, values, (err) => {
-            if(err){
+            if (err) {
               console.error("Fehler beim Einfügen der Daten")
-              return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
+              return res.status(500).json({ error: "Fehler beim Einfügen der Daten" })
             } else {
               console.log("Daten erfolgreich eingefügt")
               //res.json({ message: `Ergebnisse für: ${userCode}, ${powerConsumption}, ${ecoElectricity}, ${heatingType}, ${heatingConsumption}` });
@@ -163,7 +163,7 @@ app.post('/api/living-results', (req, res) => {
         }
       })
     }
-    })
+  })
 })
 
 //receive mobility-results from frontend
@@ -173,9 +173,9 @@ app.post('/api/mobility-results', (req, res) => {
   const publicDistance = 100 //km
 
 
-  if ( !userCode && !carType && !carDistance && !publicTransport && !flightOptions) {
+  if (!userCode && !carType && !carDistance && !publicTransport && !flightOptions) {
     return res.status(400).json({ error: "Eingabe fehlt!" });
-  }else if (!userCode || !carType || !carDistance || !publicTransport || !flightOptions) {
+  } else if (!userCode || !carType || !carDistance || !publicTransport || !flightOptions) {
     return res.status(400).json({ error: "Eingabe nicht volständig" });
   }
 
@@ -187,21 +187,21 @@ app.post('/api/mobility-results', (req, res) => {
   let sql = 'DELETE FROM quest_results WHERE user_id=? AND (quest_id=3 OR quest_id=4 OR quest_id=5 OR quest_id=6 OR quest_id=7)';
   let values = [userCode];
   db.run(sql, values, (err) => {
-    if(err){
+    if (err) {
       console.error("Fehler beim Löschen der Daten")
-      return res.status(500).json({error: "Fehler beim Löschen der Daten"})
+      return res.status(500).json({ error: "Fehler beim Löschen der Daten" })
     } else {
       console.log("Daten erfolgreich gelöscht")
 
       let sql = 'SELECT EF FROM questions WHERE id=? OR id=? OR id=? OR id=? OR id=? ORDER BY id ASC'
       let values = [3, 4, 5]
       db.all(sql, values, (err, rows) => {
-        if(err) {
+        if (err) {
           console.error("Fehler bei der Abfrage")
-          return res.status(500).json({error: "Fehler beim Abfragen des EF"})
+          return res.status(500).json({ error: "Fehler beim Abfragen des EF" })
         } else if (rows) {
-          console.log("EF abgefragt:", {rows});
-          
+          console.log("EF abgefragt:", { rows });
+
 
           // Calculate car emission
           const carEF = JSON.parse(rows[0]['EF'])[carType]
@@ -210,15 +210,15 @@ app.post('/api/mobility-results', (req, res) => {
           let sql = 'INSERT INTO quest_results (user_id, quest_id, emission) VALUES (?, ?, ?)'
           let values = [userCode, 3, carEmission]
           db.run(sql, values, (err) => {
-            if(err){
+            if (err) {
               console.error("Fehler beim Einfügen der Daten")
-              return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
+              return res.status(500).json({ error: "Fehler beim Einfügen der Daten" })
             } else {
               console.log("Daten erfolgreich eingefügt")
               //res.json({ message: `Ergebnisse für: ${userCode}, ${carType}, ${carConsumption}, ${carDistance}, ${publicTransport}, ${trainDistance}, ${trainDuration}, ${planeDistance}, ${planeDuration}` });
             }
           })
-        
+
           // Calculate public transport emission
           const publicTransportEF = JSON.parse(rows[1]['EF'])[publicTransport]
           const publicTransportEmission = publicDistance * publicTransportEF
@@ -226,9 +226,9 @@ app.post('/api/mobility-results', (req, res) => {
           sql = 'INSERT INTO quest_results (user_id, quest_id, emission) VALUES (?, ?, ?)'
           values = [userCode, 4, publicTransportEmission]
           db.run(sql, values, (err) => {
-            if(err){
+            if (err) {
               console.error("Fehler beim Einfügen der Daten")
-              return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
+              return res.status(500).json({ error: "Fehler beim Einfügen der Daten" })
             } else {
               console.log("Daten erfolgreich eingefügt")
               //res.json({ message: `Ergebnisse für: ${userCode}, ${carType}, ${carConsumption}, ${carDistance}, ${publicTransport}, ${trainDistance}, ${trainDuration}, ${planeDistance}, ${planeDuration}` });
@@ -238,13 +238,13 @@ app.post('/api/mobility-results', (req, res) => {
           // Calculate flight emission
           const flightEF = JSON.parse(rows[2]['EF'])[flightType]
           const flightEmission = flightCount * flightEF
-          
+
           sql = 'INSERT INTO quest_results (user_id, quest_id, emission) VALUES (?, ?, ?)'
           values = [userCode, 5, flightEmission]
           db.run(sql, values, (err) => {
-            if(err){
+            if (err) {
               console.error("Fehler beim Einfügen der Daten")
-              return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
+              return res.status(500).json({ error: "Fehler beim Einfügen der Daten" })
             } else {
               console.log("Daten erfolgreich eingefügt")
               //res.json({ message: `Ergebnisse für: ${userCode}, ${carType}, ${carConsumption}, ${carDistance}, ${publicTransport}, ${trainDistance}, ${trainDuration}, ${planeDistance}, ${planeDuration}` });
@@ -253,18 +253,18 @@ app.post('/api/mobility-results', (req, res) => {
         }
       })
     }
-    })
+  })
 })
-        
+
 //receive food-results from frontend
 
 app.post('/api/food-results', (req, res) => {
 
-  const { userCode, dietType, localFood, processedFood} = req.body; // Daten aus dem Body abrufen
+  const { userCode, dietType, localFood, processedFood } = req.body; // Daten aus dem Body abrufen
 
-  if ( !userCode && !dietType && !localFood && !processedFood) {
+  if (!userCode && !dietType && !localFood && !processedFood) {
     return res.status(400).json({ error: "Eingabe fehlt!" });
-  }else if (!userCode || !dietType || !localFood || !processedFood) {
+  } else if (!userCode || !dietType || !localFood || !processedFood) {
     return res.status(400).json({ error: "Eingabe nicht volständig" });
   }
 
@@ -274,9 +274,9 @@ app.post('/api/food-results', (req, res) => {
 
   db.run(sql, values, (err) => {
 
-    if(err){
+    if (err) {
       console.error("Fehler beim Löschen der Daten")
-      return res.status(500).json({error: "Fehler beim Löschen der Daten"})
+      return res.status(500).json({ error: "Fehler beim Löschen der Daten" })
     }
     console.log("Daten erfolgreich gelöscht")
 
@@ -285,11 +285,11 @@ app.post('/api/food-results', (req, res) => {
 
     db.all(sql, values, (err, rows) => {
 
-      if(err) {
+      if (err) {
         console.error("Fehler bei der Abfrage")
-        return res.status(500).json({error: "Fehler beim Abfragen des EF"})
+        return res.status(500).json({ error: "Fehler beim Abfragen des EF" })
       }
-      console.log("EF abgefragt:", {rows});
+      console.log("EF abgefragt:", { rows });
 
       // Calculate meat emission
       const dietEF = JSON.parse(rows[0]['EF'])[dietType]
@@ -298,9 +298,9 @@ app.post('/api/food-results', (req, res) => {
       let sql = 'INSERT INTO quest_results (user_id, quest_id, emission) VALUES (?, ?, ?)'
       let values = [userCode, 6, dietEmission]
       db.run(sql, values, (err) => {
-        if(err){
+        if (err) {
           console.error("Fehler beim Einfügen der Daten")
-          return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
+          return res.status(500).json({ error: "Fehler beim Einfügen der Daten" })
         }
         console.log("Daten erfolgreich eingefügt")
       })
@@ -313,9 +313,9 @@ app.post('/api/food-results', (req, res) => {
       sql = 'INSERT INTO quest_results (user_id, quest_id, emission) VALUES (?, ?, ?)'
       values = [userCode, 7, regionalEmission]
       db.run(sql, values, (err) => {
-        if(err){
+        if (err) {
           console.error("Fehler beim Einfügen der Daten")
-          return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
+          return res.status(500).json({ error: "Fehler beim Einfügen der Daten" })
         }
         console.log("Daten erfolgreich eingefügt")
       })
@@ -327,9 +327,9 @@ app.post('/api/food-results', (req, res) => {
       sql = 'INSERT INTO quest_results (user_id, quest_id, emission) VALUES (?, ?, ?)'
       values = [userCode, 8, processedEmission]
       db.run(sql, values, (err) => {
-        if(err){
+        if (err) {
           console.error("Fehler beim Einfügen der Daten")
-          return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
+          return res.status(500).json({ error: "Fehler beim Einfügen der Daten" })
         }
         console.log("Daten erfolgreich eingefügt")
       })
@@ -341,11 +341,11 @@ app.post('/api/food-results', (req, res) => {
 
 app.post('/api/consumption-results', (req, res) => {
 
-  const { userCode, clothingAmount, usedClothing, onlineOrders, foodWaste} = req.body; // Daten aus dem Body abrufen
+  const { userCode, clothingAmount, usedClothing, onlineOrders, foodWaste } = req.body; // Daten aus dem Body abrufen
 
-  if ( !userCode && !clothingAmount && !usedClothing && !onlineOrders && !foodWaste) {
+  if (!userCode && !clothingAmount && !usedClothing && !onlineOrders && !foodWaste) {
     return res.status(400).json({ error: "Eingabe fehlt!" });
-  }else if (!userCode || !clothingAmount || !usedClothing || !onlineOrders || !foodWaste) {
+  } else if (!userCode || !clothingAmount || !usedClothing || !onlineOrders || !foodWaste) {
     return res.status(400).json({ error: "Eingabe nicht volständig" });
   }
 
@@ -354,10 +354,10 @@ app.post('/api/consumption-results', (req, res) => {
   let values = [userCode];
 
   db.run(sql, values, (err) => {
-    
-    if(err){
+
+    if (err) {
       console.error("Fehler beim Löschen der Daten")
-      return res.status(500).json({error: "Fehler beim Löschen der Daten"})
+      return res.status(500).json({ error: "Fehler beim Löschen der Daten" })
     }
     console.log("Daten erfolgreich gelöscht")
 
@@ -366,11 +366,11 @@ app.post('/api/consumption-results', (req, res) => {
 
     db.all(sql, values, (err, rows) => {
 
-      if(err) {
+      if (err) {
         console.error("Fehler bei der Abfrage")
-        return res.status(500).json({error: "Fehler beim Abfragen des EF"})
+        return res.status(500).json({ error: "Fehler beim Abfragen des EF" })
       }
-      console.log("EF abgefragt:", {rows});
+      console.log("EF abgefragt:", { rows });
 
       // Calculate clothing emission
       const clothingEF = JSON.parse(rows[0]['EF'])["general"]
@@ -379,9 +379,9 @@ app.post('/api/consumption-results', (req, res) => {
       let sql = 'INSERT INTO quest_results (user_id, quest_id, emission) VALUES (?, ?, ?)'
       let values = [userCode, 9, clothingEmission]
       db.run(sql, values, (err) => {
-        if(err){
+        if (err) {
           console.error("Fehler beim Einfügen der Daten")
-          return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
+          return res.status(500).json({ error: "Fehler beim Einfügen der Daten" })
         }
         console.log("Daten erfolgreich eingefügt")
       })
@@ -393,9 +393,9 @@ app.post('/api/consumption-results', (req, res) => {
       sql = 'INSERT INTO quest_results (user_id, quest_id, emission) VALUES (?, ?, ?)'
       values = [userCode, 10, usedEmission]
       db.run(sql, values, (err) => {
-        if(err){
+        if (err) {
           console.error("Fehler beim Einfügen der Daten")
-          return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
+          return res.status(500).json({ error: "Fehler beim Einfügen der Daten" })
         }
         console.log("Daten erfolgreich eingefügt")
       })
@@ -408,9 +408,9 @@ app.post('/api/consumption-results', (req, res) => {
       sql = 'INSERT INTO quest_results (user_id, quest_id, emission) VALUES (?, ?, ?)'
       values = [userCode, 11, onlineEmission]
       db.run(sql, values, (err) => {
-        if(err){
+        if (err) {
           console.error("Fehler beim Einfügen der Daten")
-          return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
+          return res.status(500).json({ error: "Fehler beim Einfügen der Daten" })
         }
         console.log("Daten erfolgreich eingefügt")
       })
@@ -423,9 +423,9 @@ app.post('/api/consumption-results', (req, res) => {
       values = [userCode, 12, wasteEmission]
 
       db.run(sql, values, (err) => {
-        if(err){
+        if (err) {
           console.error("Fehler beim Einfügen der Daten")
-          return res.status(500).json({error: "Fehler beim Einfügen der Daten"})
+          return res.status(500).json({ error: "Fehler beim Einfügen der Daten" })
         }
         console.log("Daten erfolgreich eingefügt")
       })
@@ -479,7 +479,7 @@ app.get('/api/results/:userCode', (req, res) => {
 
     rows.forEach(({ quest_id, name, total_emission }) => {
       const category = categories[quest_id] || "Other";
-      
+
       if (!results[category]) {
         results[category] = {
           category,
@@ -491,9 +491,9 @@ app.get('/api/results/:userCode', (req, res) => {
         };
       }
 
-      results[category].tons += total_emission/1000
+      results[category].tons += total_emission / 1000
     });
-    
+
     //round results to 2 decimal places
     for (let key in results) {
       results[key].tons = Math.round(results[key].tons * 100) / 100
@@ -503,17 +503,17 @@ app.get('/api/results/:userCode', (req, res) => {
     Object.values(results).forEach((item) => {
       if (item.tons < 2) {
         item.badges = ["Good"];
-        item.badgeColor = "badge-success";
+        item.badgeColor = "badge-primary";
         item.percentage = 100;
         item.description = "You have a very low CO₂ footprint in this category!";
       } else if (item.tons < 5) {
         item.badges = ["So so"];
-        item.badgeColor = "badge-warning";
+        item.badgeColor = "badge-success";
         item.percentage = 60;
         item.description = "Your CO₂ footprint is average, but there is room for improvement.";
       } else {
         item.badges = ["Bad"];
-        item.badgeColor = "badge-error";
+        item.badgeColor = "badge-secondary";
         item.percentage = 10;
         item.description = "Your CO₂ footprint is high. Try making more environmentally friendly choices.";
       }

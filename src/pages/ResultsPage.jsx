@@ -31,7 +31,11 @@ function ResultsPage() {
       <h2>Your Results</h2>
       <div className="grid grid-cols-2 gap-2">
         {data.map((item, index) => (
-          <Card key={index} image={`${item.category.toLowerCase()}.jpg`} imageAlt={item.category} title={item.category} badges={item.badges} badgeColor={item.badgeColor}>
+          <Card key={index}
+          image={`${item.category.toLowerCase()}.jpg`}
+          imageAlt={item.category} title={item.category}
+          badges={item.badges}
+          badgeColor={item.badgeColor}>
             <Stat tons={item.tons} percentage={item.percentage} />
             <p>{item.description}</p>
             <Progress value={Math.min(Math.max(item.percentage, 0), 100)} />

@@ -23,6 +23,14 @@ export default {
           "success": "#16a34a",      // green-600 - softer green for success states
           "warning": "#f59e0b",      // amber-500 - bright amber for warnings
           "error": "#ef4444",        // red-500 - clearer red for error states
+
+          // // Badge-specific colors
+          // "badge-success": "#16a34a",
+          // "badge-success-content": "#ffffff",
+          // "badge-warning": "#f59e0b",
+          // "badge-warning-content": "#ffffff",
+          // "badge-error": "#ef4444",
+          // "badge-error-content": "#ffffff"
         },
       },
     ],
