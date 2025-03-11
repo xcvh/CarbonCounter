@@ -51,7 +51,7 @@ function sendToBackend(powerConsumption, energySource, heatingType, heatingConsu
         body: JSON.stringify({
             userCode: getCookie("userCode"),
             powerConsumption: powerConsumption,
-            ecoElectricity: energySource === 'renewable',
+            energySource: energySource,
             heatingType: heatingType,
             heatingConsumption: heatingConsumption
         }),
@@ -91,12 +91,13 @@ function LivingPage() {
     ];
 
     const energySourceOptions = [
-        { value: 'renewable', label: 'Renewable' },
-        { value: 'coal', label: 'Coal' },
+        { value: 'eco', label: 'Renewable' },
+        { value: 'conventional', label: 'Coal' },
     ];
 
     const handleSubmit = () => {
-        console.log({ energySource, heatingType });
+        console.log({ powerConsumption, energySource, heatingType, heatingConsumption });
+        sendToBackend(powerConsumption, energySource, heatingType, heatingConsumption);
         navigate('/calculator/mobility');
     };
 

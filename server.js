@@ -96,11 +96,11 @@ app.post('/api/user', (req, res) => {
 
 // receive living-results from frontend
 app.post('/api/living-results', (req, res) => {
-  const { userCode, powerConsumption, ecoElectricity, heatingType, heatingConsumption } = req.body; // Daten aus dem Body abrufen
+  const { userCode, powerConsumption, energySource, heatingType, heatingConsumption } = req.body; // Daten aus dem Body abrufen
 
-  if ( !userCode && !powerConsumption && !ecoElectricity && !heatingType && !heatingConsumption) {
+  if ( !userCode && !powerConsumption && !energySource && !heatingType && !heatingConsumption) {
     return res.status(400).json({ error: "Eingabe fehlt!" });
-  }else if (!userCode || !powerConsumption || !ecoElectricity || !heatingType || !heatingConsumption) {
+  }else if (!userCode || !powerConsumption || !energySource || !heatingType || !heatingConsumption) {
     return res.status(400).json({ error: "Eingabe nicht volständig" });
   }
 
@@ -125,7 +125,7 @@ app.post('/api/living-results', (req, res) => {
           
 
           // Calculate electric emission
-          const electricEF = JSON.parse(rows[0]['EF'])[ecoElectricity]
+          const electricEF = JSON.parse(rows[0]['EF'])[energySource]
           const electricEmission = powerConsumption * electricEF
 
           let sql = 'INSERT INTO quest_results (user_id, quest_id, emission) VALUES (?, ?, ?)'
