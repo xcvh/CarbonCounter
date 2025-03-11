@@ -491,8 +491,13 @@ app.get('/api/results/:userCode', (req, res) => {
         };
       }
 
-      results[category].tons += parseFloat((total_emission/1000).toFixed(2));
+      results[category].tons += total_emission/1000
     });
+    
+    //round results to 2 decimal places
+    for (let key in results) {
+      results[key].tons = Math.round(results[key].tons * 100) / 100
+    }
 
     // Bewertung und Badge-Farben setzen
     Object.values(results).forEach((item) => {
